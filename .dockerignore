@@ -1,0 +1,5 @@
+*
+!rootfs/
+!go.mod
+!go.sum
+!cmd/

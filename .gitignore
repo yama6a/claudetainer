@@ -1,0 +1,9 @@
+.DS_Store
+.idea/
+.vscode/
+.claude/settings.local.json
+*.local
+/.build/
+/cover.out
+# Holds copies of personal Claude config for offgrid-private, so it must never reach this public repo.
+chart-draft/

@@ -1,0 +1,112 @@
+#!/usr/bin/env bash
+# Container entrypoint: prepares config, git, gh and the Claude login, then becomes the Remote Control server.
+set -euo pipefail
+
+# ---- knobs ----
+SERVER_DIR=/workspace/sessions/home       # never change: `claude rc` finds its sessions again by this folder
+SECRETS=/etc/claudetainer/secrets         # one read-only Secret volume per subfolder
+USER_CONFIG=/etc/claudetainer/user-config # the personal-config ConfigMap
+MARKETPLACE_DIR=/opt/claudetainer-plugins # vendored in the image
+MARKETPLACE=claudetainer-plugins
+PLUGINS=(gopls-lsp feature-dev context7 playwright)
+
+log() { printf 'claudetainer-start: %s\n' "$*" >&2; }
+die() {
+  log "$*"
+  exit 1
+}
+
+# The image sets these empty to hide the base image's values. Claude and nvm need them absent.
+unset BASH_ENV CLAUDE_ENV_FILE NPM_CONFIG_PREFIX
+
+: "${CLAUDE_CONFIG_DIR:?}" "${GH_CONFIG_DIR:?}" "${GIT_CONFIG_GLOBAL:?}"
+: "${CLAUDETAINER_GIT_NAME:?}" "${CLAUDETAINER_GIT_EMAIL:?}"
+
+mkdir -p "$CLAUDE_CONFIG_DIR" "$SERVER_DIR" /workspace/.cache "$HOME/.ssh" "$GH_CONFIG_DIR"
+chmod 0700 "$HOME/.ssh"
+
+sync_user_config() {
+  local list="$CLAUDE_CONFIG_DIR/.claudetainer-user-config.list" new rel
+  new="$(mktemp)"
+  # A ConfigMap volume holds each file behind ..data symlinks, so -L and the ..* filter give the real files.
+  (cd "$USER_CONFIG" && find -L . -type f -not -path './..*' | sed 's|^\./||' | LC_ALL=C sort) > "$new"
+  if [ -f "$list" ]; then
+    LC_ALL=C comm -23 "$list" "$new" | while IFS= read -r rel; do rm -f "${CLAUDE_CONFIG_DIR:?}/$rel"; done
+  fi
+  while IFS= read -r rel; do
+    mkdir -p "$(dirname "$CLAUDE_CONFIG_DIR/$rel")"
+    cp -L "$USER_CONFIG/$rel" "$CLAUDE_CONFIG_DIR/$rel"
+    case "$rel" in *.sh) chmod 0755 "$CLAUDE_CONFIG_DIR/$rel" ;; *) chmod 0644 "$CLAUDE_CONFIG_DIR/$rel" ;; esac
+  done < "$new"
+  mv "$new" "$list"
+}
+
+# Keys other tools write, such as oauthAccount and machineID, stay as they are.
+seed_claude_json() {
+  local f="$CLAUDE_CONFIG_DIR/.claude.json" tmp
+  [ -s "$f" ] || echo '{}' > "$f"
+  tmp="$(mktemp)"
+  jq '. + {hasCompletedOnboarding: true, remoteDialogSeen: true, autoUpdates: false}
+    | .projects["/workspace"] = ((.projects["/workspace"] // {}) + {hasTrustDialogAccepted: true})' "$f" > "$tmp"
+  mv "$tmp" "$f"
+}
+
+# git-guard.sh blocks any commit unless the global config signs it, so signing is not optional here.
+write_git_config() {
+  install -m 0600 "$SECRETS/signing-key/id_ed25519" "$HOME/.ssh/signing_key"
+  rm -f "$GIT_CONFIG_GLOBAL"
+  git config --global user.name "$CLAUDETAINER_GIT_NAME"
+  git config --global user.email "$CLAUDETAINER_GIT_EMAIL"
+  git config --global user.signingkey "$HOME/.ssh/signing_key"
+  git config --global gpg.format ssh
+  git config --global commit.gpgsign true
+  git config --global push.default current
+  git config --global push.autoSetupRemote true
+  git config --global pull.rebase true
+  git config --global init.defaultBranch master
+}
+
+write_gh_config() {
+  rm -f "$GH_CONFIG_DIR/hosts.yml"
+  gh auth login --hostname github.com --git-protocol https --with-token < "$SECRETS/github/token"
+  gh auth setup-git --hostname github.com
+}
+
+# A refresh token works once, so the start logs in only when the sealed token is new, and remembers its hash.
+login() {
+  local token="$SECRETS/claude/refresh-token" scopes="$SECRETS/claude/scopes"
+  local seen="$CLAUDE_CONFIG_DIR/.claudetainer-login-hash" hash
+  hash="$(sha256sum < "$token" | cut -d' ' -f1)"
+  if [ "$hash" != "$(cat "$seen" 2> /dev/null || true)" ]; then
+    log "new sealed refresh token, logging in"
+    CLAUDE_CODE_OAUTH_REFRESH_TOKEN="$(< "$token")" CLAUDE_CODE_OAUTH_SCOPES="$(< "$scopes")" \
+      claude auth login --claudeai < /dev/null || die "claude auth login failed with the sealed refresh token"
+    echo "$hash" > "$seen"
+  fi
+  claude auth status 2> /dev/null | jq -e '.loggedIn == true and .authMethod == "claude.ai"' > /dev/null \
+    || die "no claude.ai login. Seal a new refresh token, see docs/runbooks/04_login.md"
+}
+
+install_plugins() {
+  local p
+  claude plugin marketplace add "$MARKETPLACE_DIR" > /dev/null 2>&1 \
+    || claude plugin marketplace update "$MARKETPLACE" > /dev/null \
+    || log "marketplace $MARKETPLACE could not be added or updated"
+  for p in "${PLUGINS[@]}"; do
+    claude plugin install "$p@$MARKETPLACE" --yes > /dev/null 2>&1 \
+      || claude plugin update "$p@$MARKETPLACE" > /dev/null \
+      || log "plugin $p could not be installed"
+  done
+}
+
+sync_user_config
+seed_claude_json
+write_git_config
+write_gh_config
+login
+install_plugins
+
+setsid /usr/local/lib/claudetainer/sweep.sh > /dev/null 2>&1 < /dev/null &
+
+cd "$SERVER_DIR"
+exec claude remote-control --spawn worktree --permission-mode bypassPermissions

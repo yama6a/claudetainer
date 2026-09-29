@@ -1,0 +1,25 @@
+{
+  "cleanupPeriodDays": 365,
+  "hooks": {
+    "WorktreeCreate": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/usr/local/lib/claudetainer/worktree-create.sh"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/usr/local/lib/claudetainer/session-start.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

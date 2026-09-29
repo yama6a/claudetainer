@@ -1,0 +1,61 @@
+{
+  // Opens dependency-update PRs for every pin in the repo. Which manager owns what:
+  //   dockerfile      the sandbox-templates base and the golang builder stage
+  //   gomod           the login-exporter's Go dependencies
+  //   github-actions  the workflows' own action pins
+  //   customManagers  every `# renovate:`-annotated ARG in the Dockerfile, since Renovate cannot see what a
+  //                   curl URL further down does with them
+  // Cadence is the cron in .github/workflows/renovate.yaml. Every merged bump releases and deploys, which
+  // restarts the pod, so the build jobs in ci.yaml are what keep a broken pin off the cluster.
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  extends: ["github>yama6a/gha:default.json5", "github>yama6a/gha:go.json5"],
+
+  prConcurrentLimit: 5,
+
+  customManagers: [
+    {
+      // Each ARG names its own datasource in the comment above it. An ARG without that comment is never updated.
+      customType: "regex",
+      description: "annotated version ARGs in the Dockerfile",
+      managerFilePatterns: ["/^Dockerfile$/"],
+      matchStrings: [
+        "# renovate: datasource=(?<datasource>[a-z-]+) depName=(?<depName>\\S+)(?: versioning=(?<versioning>\\S+))?\\s+ARG \\w+=(?<currentValue>\\S+)",
+        // A commit pin: Renovate follows the branch and proposes its newest commit.
+        "# renovate: datasource=(?<datasource>git-refs) depName=(?<depName>\\S+) branch=(?<currentValue>\\S+)\\s+ARG \\w+=(?<currentDigest>[0-9a-f]{40})",
+      ],
+    },
+  ],
+
+  packageRules: [
+    {
+      // The tag carries the flavour, so only the trailing number is a version.
+      description: "sandbox-templates: follow claude-code-minimal-X.Y.Z",
+      matchDepNames: ["docker/sandbox-templates"],
+      versioning: "regex:^claude-code-minimal-(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)$",
+    },
+    {
+      description: "golangci-lint releases are v-prefixed, the ARG is not",
+      matchDepNames: ["golangci/golangci-lint"],
+      extractVersion: "^v(?<version>.+)$",
+    },
+    {
+      // kustomize lives in a monorepo, so its releases are tagged kustomize/v5.8.1 while the ARG is v5.8.1.
+      description: "strip the kustomize/ prefix from monorepo release tags",
+      matchDepNames: ["kubernetes-sigs/kustomize"],
+      extractVersion: "^kustomize/(?<version>.+)$",
+    },
+    {
+      // Two ARGs track nodejs/node. Each stays on its own major, which the image offers through nvm.
+      description: "node 24 stays on 24",
+      matchDepNames: ["nodejs/node"],
+      matchCurrentValue: "/^v24\\./",
+      allowedVersions: "/^v24\\./",
+    },
+    {
+      description: "node 26 stays on 26",
+      matchDepNames: ["nodejs/node"],
+      matchCurrentValue: "/^v26\\./",
+      allowedVersions: "/^v26\\./",
+    },
+  ],
+}

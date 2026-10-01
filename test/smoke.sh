@@ -44,6 +44,7 @@ probes="$(
     p playwright-plugin "jq -r .playwright.command /opt/claudetainer-plugins/external_plugins/playwright/.mcp.json"
     p context7-plugin "jq -r .mcpServers.context7.headersHelper /opt/claudetainer-plugins/external_plugins/context7/.mcp.json"
     p context7-headers "/usr/local/lib/claudetainer/context7-headers.sh"
+    p scheduled-session "/usr/local/lib/claudetainer/scheduled-session.sh Bad < /dev/null 2>&1 || true"
     p login-exporter "(login-exporter > /dev/null 2>&1 &) && sleep 1 && curl -fsS localhost:9100/metrics | grep ^claudetainer_login_present"
     p uid "id -u"
     p bash-env "echo \"[${BASH_ENV}]\""
@@ -99,6 +100,7 @@ expect marketplace claudetainer-plugins
 expect playwright-plugin playwright-mcp
 expect context7-plugin /usr/local/lib/claudetainer/context7-headers.sh
 expect context7-headers "{}"
+expect scheduled-session "usage: scheduled-session.sh"
 expect login-exporter "claudetainer_login_present 0"
 expect uid 1000
 expect bash-env "[]"

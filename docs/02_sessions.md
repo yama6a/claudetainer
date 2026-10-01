@@ -10,6 +10,7 @@ in [runbooks/02_sessions.md](runbooks/02_sessions.md).
 | `/workspace/sessions/home/` | the server's own folder, and the session it pre-creates at start | never, it is fixed |
 | `/workspace/sessions/home/*` | whatever that session cloned | the sweep, 30 days after the newest file changed |
 | `/workspace/sessions/bridge-<id>/` | one on-demand session: its clones | the sweep, 30 days after its last transcript write |
+| `/workspace/sessions/scheduled-<name>-<time>/` | one scheduled session: its clones | the sweep, 30 days after its last transcript write |
 | `<session folder>/.home/` | that session's HOME: GOPATH, `~/.local`, its kubeconfig | with its folder |
 | `/workspace/.cache/` | Go module and build caches, npm and uv caches, shared | the sweep, whole, above 20 GiB |
 | `/opt/nvm/` | Node 24 and 26, and whatever `npm install -g` adds | the next pod restart |
@@ -30,7 +31,29 @@ the hooks in your personal settings.
 The env file reaches Bash commands only. Hooks, gopls and MCP servers keep `HOME=/home/agent`. So the cache
 locations are set in the container environment, not per session.
 
+## Scheduled sessions
+
+A scheduled session is a session that starts on a cron schedule with a fixed prompt. You read and answer it in
+claude.ai like any other session.
+
+1. A CronJob in the chart runs `kubectl exec` into the claudetainer pod. It passes a name and pipes the prompt.
+2. `scheduled-session.sh` creates `/workspace/sessions/scheduled-<name>-<time>/`.
+3. It starts `claude --bg --remote-control` there. The session shows in claude.ai as `<name> <time>`.
+
+Background sessions run under Claude Code's own supervisor process inside the pod, apart from the
+`claude remote-control` server.
+
 ## Decisions
+
+- **`claude --bg --remote-control`, not a session from the server.** The server cannot start a session itself.
+  A background session with Remote Control shows in claude.ai and uses the pod's login.
+- **Started by `kubectl exec`, not by a pod of its own.** A second pod needs its own login, because a refresh
+  token works once. Cost: a ServiceAccount that may exec into the claudetainer pod, see
+  [06_access.md](06_access.md).
+- **Schedule and prompt in the chart, the start script in the image.** The prompt is personal. The way to start
+  a session is the same for every user.
+- **A pod restart stops a running scheduled session.** The supervisor dies with the pod. The server brings back
+  only its own sessions. The next run starts a new session.
 
 - **A folder per session, from `--spawn worktree` and a WorktreeCreate hook.** Git worktrees of one repo do not
   fit sessions that clone several repos. The hook-created folder is empty, and Claude clones into it.

@@ -11,6 +11,7 @@ What a session can reach, with which credential, and the risks accepted with it.
 | SSH signing key | `claudetainer-signing-key` | signs commits as you. Registered on GitHub as a signing key only |
 | Claude login | `claudetainer-claude-login` | the Max subscription, see [04_login.md](04_login.md) |
 | ServiceAccount `claudetainer` | none, projected token | cluster-admin |
+| ServiceAccount `claudetainer-scheduled-session` | none, projected token | get the claudetainer Deployment and pods, exec into them |
 | talosconfig with `os:reader` | `claudetainer-talosconfig` | reads node state, services and logs. Changes nothing |
 | Context7 API key | `claudetainer-context7`, optional | a higher rate limit for the context7 plugin |
 
@@ -24,6 +25,7 @@ Cilium runs with `policyAuditMode: true`. Every policy below only logs a would-b
 |---|---|---|
 | `claudetainer` | vmagent on port 9100 | DNS, the internet on any port, the API server, claudetainer-scratch, the nodes on port 50000 |
 | `claudetainer-scratch-wipe` | none | DNS, the API server |
+| `claudetainer-scheduled-session` | none | DNS, the API server |
 | `scratch` in claudetainer-scratch | from claudetainer and from pods in the namespace | DNS, the internet, pods in the namespace |
 
 ## Scratch namespace
@@ -67,3 +69,6 @@ above. It can:
 - push a branch whose workflow reads repo secrets such as DEPLOY_TOKEN.
 - reach Argo CD's API, which grants admin to anonymous callers inside the cluster.
 - read or change every other session's folder, since all sessions run as one user.
+
+Exec into the claudetainer pod gives a shell with every credential above. Only the scheduled-session
+ServiceAccount holds that right outside the pod, and only CronJob pods in the claudetainer namespace use it.

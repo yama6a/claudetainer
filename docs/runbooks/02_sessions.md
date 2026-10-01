@@ -35,6 +35,15 @@ To delete one folder by hand, archive its session in claude.ai first, then:
 kubectl -n claudetainer exec deploy/claudetainer -- sh -c 'chmod -R u+w /workspace/sessions/<name> && rm -rf /workspace/sessions/<name>'
 ```
 
+## Start a scheduled session now
+
+```bash
+kubectl -n claudetainer create job --from=cronjob/claudetainer-scheduled-<name> <name>-manual
+kubectl -n claudetainer logs -f job/<name>-manual
+```
+
+Expected: `backgrounded` and a short session ID. A session `<name> <time>` shows in claude.ai within a minute.
+
 ## Restart the server
 
 ```bash

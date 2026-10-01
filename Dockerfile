@@ -1,10 +1,10 @@
-# syntax=docker/dockerfile:1@sha256:ecfaec9ed6d810b56388c508f4121597bfbba70d41a6dfeee4d8cad5f295fc32
+# syntax=docker/dockerfile:1@sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e
 
 # Global scope. Redeclare each ARG bare above the RUN that uses it, so a bump rebuilds from there down.
 # renovate: datasource=npm depName=@anthropic-ai/claude-code
-ARG CLAUDE_VERSION=2.1.285
+ARG CLAUDE_VERSION=2.1.286
 # renovate: datasource=git-refs depName=https://github.com/anthropics/claude-plugins-official branch=main
-ARG CLAUDE_PLUGINS_REF=2a8ad9f74633d10e3d9bb0660a03bfc6e50584b1
+ARG CLAUDE_PLUGINS_REF=ab024cdcfa7ca80be204acd4907656ba5a968589
 # renovate: datasource=npm depName=@playwright/mcp
 ARG PLAYWRIGHT_MCP_VERSION=0.0.83
 # renovate: datasource=github-releases depName=kubernetes/kubernetes
@@ -14,7 +14,7 @@ ARG HELM_VERSION=v4.3.0
 # renovate: datasource=github-releases depName=derailed/k9s
 ARG K9S_VERSION=v0.51.0
 # renovate: datasource=github-releases depName=kubernetes-sigs/kustomize
-ARG KUSTOMIZE_VERSION=v5.8.1
+ARG KUSTOMIZE_VERSION=v5.8.2
 # renovate: datasource=github-releases depName=ahmetb/kubectx
 ARG KUBECTX_VERSION=v0.11.0
 # renovate: datasource=github-releases depName=yannh/kubeconform

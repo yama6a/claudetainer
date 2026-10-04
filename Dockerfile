@@ -2,7 +2,7 @@
 
 # Global scope. Redeclare each ARG bare above the RUN that uses it, so a bump rebuilds from there down.
 # renovate: datasource=npm depName=@anthropic-ai/claude-code
-ARG CLAUDE_VERSION=2.1.288
+ARG CLAUDE_VERSION=2.1.289
 # renovate: datasource=git-refs depName=https://github.com/anthropics/claude-plugins-official branch=main
 ARG CLAUDE_PLUGINS_REF=d182ca456ca09d31d139f7d3818d1d333b103cce
 # renovate: datasource=npm depName=@playwright/mcp

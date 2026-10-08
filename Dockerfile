@@ -2,9 +2,9 @@
 
 # Global scope. Redeclare each ARG bare above the RUN that uses it, so a bump rebuilds from there down.
 # renovate: datasource=npm depName=@anthropic-ai/claude-code
-ARG CLAUDE_VERSION=2.1.292
+ARG CLAUDE_VERSION=2.1.293
 # renovate: datasource=git-refs depName=https://github.com/anthropics/claude-plugins-official branch=main
-ARG CLAUDE_PLUGINS_REF=d4226d062928f8d9505dbdeadd10217d23361052
+ARG CLAUDE_PLUGINS_REF=b78ac49cdc6b3d7b61c4439470e311f4291265b1
 # renovate: datasource=npm depName=@playwright/mcp
 ARG PLAYWRIGHT_MCP_VERSION=0.0.83
 # renovate: datasource=github-releases depName=kubernetes/kubernetes
@@ -14,7 +14,7 @@ ARG HELM_VERSION=v4.3.0
 # renovate: datasource=github-releases depName=derailed/k9s
 ARG K9S_VERSION=v0.51.0
 # renovate: datasource=github-releases depName=kubernetes-sigs/kustomize
-ARG KUSTOMIZE_VERSION=v5.8.2
+ARG KUSTOMIZE_VERSION=v5.8.3
 # renovate: datasource=github-releases depName=ahmetb/kubectx
 ARG KUBECTX_VERSION=v0.11.0
 # renovate: datasource=github-releases depName=yannh/kubeconform
@@ -40,7 +40,7 @@ ARG NVM_VERSION=v0.40.8
 # renovate: datasource=github-tags depName=nodejs/node
 ARG NODE24_VERSION=v24.21.0
 # renovate: datasource=github-tags depName=nodejs/node
-ARG NODE26_VERSION=v26.10.0
+ARG NODE26_VERSION=v26.11.1
 # renovate: datasource=pypi depName=pgcli
 ARG PGCLI_VERSION=4.7.1
 ARG PG_MAJOR=18

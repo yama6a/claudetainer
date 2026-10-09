@@ -2,9 +2,9 @@
 
 # Global scope. Redeclare each ARG bare above the RUN that uses it, so a bump rebuilds from there down.
 # renovate: datasource=npm depName=@anthropic-ai/claude-code
-ARG CLAUDE_VERSION=2.1.293
+ARG CLAUDE_VERSION=2.1.295
 # renovate: datasource=git-refs depName=https://github.com/anthropics/claude-plugins-official branch=main
-ARG CLAUDE_PLUGINS_REF=b78ac49cdc6b3d7b61c4439470e311f4291265b1
+ARG CLAUDE_PLUGINS_REF=8206942d3ec08519557bd750858d689d082bea7c
 # renovate: datasource=npm depName=@playwright/mcp
 ARG PLAYWRIGHT_MCP_VERSION=0.0.83
 # renovate: datasource=github-releases depName=kubernetes/kubernetes
@@ -26,7 +26,7 @@ ARG TALOSCTL_VERSION=v1.14.2
 # renovate: datasource=github-releases depName=golangci/golangci-lint
 ARG GOLANGCI_LINT_VERSION=2.14.0
 # renovate: datasource=github-tags depName=golang/go versioning=regex:^go(?<major>\d+)\.(?<minor>\d+)(\.(?<patch>\d+))?$
-ARG GO_VERSION=go1.27.1
+ARG GO_VERSION=go1.27.2
 # renovate: datasource=go depName=golang.org/x/tools/gopls
 ARG GOPLS_VERSION=v0.23.0
 # renovate: datasource=go depName=github.com/oapi-codegen/oapi-codegen/v2
@@ -46,7 +46,7 @@ ARG PGCLI_VERSION=4.7.1
 ARG PG_MAJOR=18
 
 # Cross-compiles on the build machine's architecture, so this stage needs no emulation.
-FROM --platform=$BUILDPLATFORM golang:1.27-alpine@sha256:8a5910f31396cd4d89662f56c68b3ae31d374308270a1c3bd96672ee5ed43414 AS exporter
+FROM --platform=$BUILDPLATFORM golang:1.27-alpine@sha256:738d1cf061836894ff6bb8c33881080ac66de8cf0586615012a0c8f592649cfa AS exporter
 ARG TARGETOS
 ARG TARGETARCH
 WORKDIR /src

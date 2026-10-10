@@ -17,17 +17,18 @@ No sudo, no apt. Put a missing tool in `~/.local/bin`, or add it to the image wi
 
 | Area | Tools |
 |---|---|
-| Base | git, gh, curl, jq, yq, rg, make, tar, xz, unzip, rsync, ssh, dig, lsof |
+| Base | git, gh, curl, wget, jq, yq, rg, make, file, tar, xz, zip, unzip, rsync, ssh, dig, lsof |
 | Build | gcc, g++, pkg-config, autoconf, perl, python3 |
-| Python | uv. No pip: use `uv run`, `uv tool install` or `uv tool run` |
-| Go | go, gopls, golangci-lint, gofumpt, govulncheck, oapi-codegen |
+| Python | uv, uvx. No pip: use `uv run`, `uv tool install` or `uvx` |
+| Go | go, gopls, golangci-lint, gofumpt, govulncheck, oapi-codegen, dlv |
 | Node | nvm with Node 24 and 26, npm, npx |
 | PHP | mise with PHP 8.2, 8.3, 8.4 and 8.5, Composer, Xdebug, PCOV, Intelephense |
 | Kubernetes | kubectl, helm 4, kustomize, kubeconform, kubectx, kubens, k9s |
 | Talos | talosctl, read-only |
-| Postgres | psql 18, pgcli |
+| Lint | shellcheck, shfmt, actionlint, hadolint, yamllint, prettier, renovate, renovate-config-validator |
+| Databases | psql 18, pgcli, sqlite3 |
 | Browser | headless Chromium through the Playwright MCP server |
-| Plugins | gopls-lsp, php-lsp, feature-dev, context7, playwright |
+| Plugins | gopls-lsp, php-lsp, feature-dev, context7, playwright. victoriametrics and victorialogs when the pod configures them |
 
 - No Docker daemon. `docker build`, `docker run` and `act` fail.
 - Each Bash command starts in a fresh shell. Switch a runtime in the same command.

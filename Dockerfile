@@ -64,6 +64,26 @@ ARG PCOV_VERSION=v1.0.12
 ARG COMPOSER_VERSION=2.10.3
 # renovate: datasource=npm depName=intelephense
 ARG INTELEPHENSE_VERSION=1.18.5
+# renovate: datasource=github-releases depName=koalaman/shellcheck
+ARG SHELLCHECK_VERSION=v0.11.0
+# renovate: datasource=github-releases depName=mvdan/sh
+ARG SHFMT_VERSION=v3.14.1
+# renovate: datasource=github-releases depName=rhysd/actionlint
+ARG ACTIONLINT_VERSION=v1.7.12
+# renovate: datasource=github-releases depName=hadolint/hadolint
+ARG HADOLINT_VERSION=v2.15.1
+# renovate: datasource=pypi depName=yamllint
+ARG YAMLLINT_VERSION=1.38.0
+# renovate: datasource=npm depName=renovate
+ARG RENOVATE_VERSION=44.149.2
+# renovate: datasource=npm depName=prettier
+ARG PRETTIER_VERSION=3.9.10
+# renovate: datasource=github-releases depName=go-delve/delve
+ARG DELVE_VERSION=v1.27.2
+# renovate: datasource=github-releases depName=VictoriaMetrics/mcp-victoriametrics
+ARG MCP_VICTORIAMETRICS_VERSION=v1.20.2
+# renovate: datasource=github-releases depName=VictoriaMetrics/mcp-victorialogs
+ARG MCP_VICTORIALOGS_VERSION=v1.9.0
 
 # Cross-compiles on the build machine's architecture, so this stage needs no emulation.
 FROM --platform=$BUILDPLATFORM golang:1.27-alpine@sha256:f92b6ef800e499660581efdabdf25d9d817a9d124eaf900924f0504e7e27e12d AS exporter
@@ -97,7 +117,7 @@ RUN SUDO_FORCE_REMOVE=yes apt-get purge -y sudo \
 # The PHP headers stay in the final image, because sessions compile further PHP versions without apt.
 ARG PG_MAJOR
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      build-essential gnupg perl pkg-config python3 \
+      build-essential file gnupg perl pkg-config python3 sqlite3 wget zip \
       autoconf bison re2c libbz2-dev libcurl4-openssl-dev libfreetype-dev libgmp-dev libicu-dev libjpeg-dev \
       libonig-dev libpng-dev libreadline-dev libsodium-dev libsqlite3-dev libssl-dev libwebp-dev libxml2-dev \
       libzip-dev \
@@ -167,6 +187,13 @@ ARG YQ_VERSION
 ARG TALOSCTL_VERSION
 ARG GOLANGCI_LINT_VERSION
 ARG GO_VERSION
+ARG SHELLCHECK_VERSION
+ARG SHFMT_VERSION
+ARG ACTIONLINT_VERSION
+ARG HADOLINT_VERSION
+ARG DELVE_VERSION
+ARG MCP_VICTORIAMETRICS_VERSION
+ARG MCP_VICTORIALOGS_VERSION
 RUN set -eux; \
     case "${TARGETARCH}" in \
       amd64) alt_arch=x86_64 ;; \
@@ -189,6 +216,18 @@ RUN set -eux; \
       | tar -xz -C /tmp "golangci-lint-${GOLANGCI_LINT_VERSION}-linux-${TARGETARCH}/golangci-lint"; \
     install -m 0755 "/tmp/golangci-lint-${GOLANGCI_LINT_VERSION}-linux-${TARGETARCH}/golangci-lint" /usr/local/bin/golangci-lint; \
     curl -fsSL "https://go.dev/dl/${GO_VERSION}.linux-${TARGETARCH}.tar.gz" | tar -xz -C /usr/local; \
+    case "${TARGETARCH}" in amd64) gnu_arch=x86_64 ;; arm64) gnu_arch=aarch64 ;; esac; \
+    curl -fsSL "https://github.com/koalaman/shellcheck/releases/download/${SHELLCHECK_VERSION}/shellcheck-${SHELLCHECK_VERSION}.linux.${gnu_arch}.tar.xz" \
+      | tar -xJ -C /tmp "shellcheck-${SHELLCHECK_VERSION}/shellcheck"; \
+    install -m 0755 "/tmp/shellcheck-${SHELLCHECK_VERSION}/shellcheck" /usr/local/bin/shellcheck; \
+    curl -fsSL -o /usr/local/bin/shfmt "https://github.com/mvdan/sh/releases/download/${SHFMT_VERSION}/shfmt_${SHFMT_VERSION}_linux_${TARGETARCH}"; \
+    curl -fsSL -o /usr/local/bin/hadolint "https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}/hadolint-linux-${alt_arch}"; \
+    chmod 0755 /usr/local/bin/shfmt /usr/local/bin/hadolint; \
+    curl -fsSL "https://github.com/rhysd/actionlint/releases/download/${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION#v}_linux_${TARGETARCH}.tar.gz" | tar -xz -C /tmp actionlint; \
+    curl -fsSL "https://github.com/go-delve/delve/releases/download/${DELVE_VERSION}/dlv_${DELVE_VERSION#v}_linux_${TARGETARCH}.tar.gz" | tar -xz -C /tmp dlv; \
+    curl -fsSL "https://github.com/VictoriaMetrics/mcp-victoriametrics/releases/download/${MCP_VICTORIAMETRICS_VERSION}/mcp-victoriametrics_Linux_${alt_arch}.tar.gz" | tar -xz -C /tmp mcp-victoriametrics; \
+    curl -fsSL "https://github.com/VictoriaMetrics/mcp-victorialogs/releases/download/${MCP_VICTORIALOGS_VERSION}/mcp-victorialogs_Linux_${alt_arch}.tar.gz" | tar -xz -C /tmp mcp-victorialogs; \
+    install -m 0755 /tmp/actionlint /tmp/dlv /tmp/mcp-victoriametrics /tmp/mcp-victorialogs /usr/local/bin/; \
     rm -rf /tmp/*
 
 ARG GOPLS_VERSION
@@ -244,11 +283,31 @@ RUN npm install --prefix /opt/intelephense --no-audit --no-fund "intelephense@${
     && chmod -R a+rX /opt/intelephense \
     && rm -rf /root/.npm
 
-# uv tools install under $HOME by default, which is per session here, so bake pgcli at a shared path.
+# uv tools install under $HOME by default, which is per session here, so bake them at a shared path.
 ARG PGCLI_VERSION
-RUN UV_TOOL_DIR=/opt/uv-tools UV_TOOL_BIN_DIR=/usr/local/bin uv tool install --no-cache \
-      --python /usr/bin/python3 "pgcli==${PGCLI_VERSION}" \
+ARG YAMLLINT_VERSION
+RUN export UV_TOOL_DIR=/opt/uv-tools UV_TOOL_BIN_DIR=/usr/local/bin \
+    && uv tool install --no-cache --python /usr/bin/python3 "pgcli==${PGCLI_VERSION}" \
+    && uv tool install --no-cache --python /usr/bin/python3 "yamllint==${YAMLLINT_VERSION}" \
     && chmod -R a+rX /opt/uv-tools
+
+ARG PRETTIER_VERSION
+RUN npm install --prefix /opt/prettier --no-audit --no-fund "prettier@${PRETTIER_VERSION}" \
+    && ln -s /opt/prettier/node_modules/.bin/prettier /usr/local/bin/prettier \
+    && chmod -R a+rX /opt/prettier \
+    && rm -rf /root/.npm
+
+# Renovate refuses any Node but 24, so its commands run on Node 24 whatever the session's default is.
+ARG RENOVATE_VERSION
+ARG NODE24_VERSION
+RUN node24="${NVM_DIR}/versions/node/${NODE24_VERSION}/bin" \
+    && PATH="${node24}:${PATH}" npm install --prefix /opt/renovate --no-audit --no-fund "renovate@${RENOVATE_VERSION}" \
+    && for bin in renovate renovate-config-validator; do \
+         printf '#!/bin/sh\nexec %s/node /opt/renovate/node_modules/.bin/%s "$@"\n' "${node24}" "${bin}" > "/usr/local/bin/${bin}"; \
+         chmod 0755 "/usr/local/bin/${bin}"; \
+       done \
+    && chmod -R a+rX /opt/renovate \
+    && rm -rf /root/.npm
 
 # The browser comes from the MCP server's own playwright, so its revision always matches the server's.
 ARG PLAYWRIGHT_MCP_VERSION
@@ -260,9 +319,10 @@ RUN npm install --prefix /opt/playwright-mcp --no-audit --no-fund "@playwright/m
     && rm -rf /var/lib/apt/lists/* /root/.npm
 
 # The marketplace is renamed because Claude Code reserves claude-plugins-official for the GitHub source.
-# Only the five plugins the pod enables are kept. playwright runs the pinned server above, not @latest, and
+# Only the five plugins the pod enables are kept, plus the two VictoriaMetrics plugins from build/plugins/. playwright runs the pinned server above, not @latest, and
 # context7 reads its API key from a Secret file through a headersHelper, not from an environment variable.
 ARG CLAUDE_PLUGINS_REF
+COPY build/plugins/ /opt/claudetainer-plugins/plugins/
 RUN mkdir -p /opt/claudetainer-plugins \
     && curl -fsSL "https://codeload.github.com/anthropics/claude-plugins-official/tar.gz/${CLAUDE_PLUGINS_REF}" \
       | tar -xz -C /opt/claudetainer-plugins --strip-components=1 \
@@ -273,9 +333,14 @@ RUN mkdir -p /opt/claudetainer-plugins \
         "claude-plugins-official-${CLAUDE_PLUGINS_REF}/external_plugins/context7" \
         "claude-plugins-official-${CLAUDE_PLUGINS_REF}/external_plugins/playwright" \
     && m=/opt/claudetainer-plugins/.claude-plugin/marketplace.json \
-    && jq '.name = "claudetainer-plugins" | .plugins |= map(select(.name | IN("gopls-lsp", "php-lsp", "feature-dev", "context7", "playwright")))' "$m" > /tmp/m.json \
+    && jq '.name = "claudetainer-plugins" \
+      | .plugins |= map(select(.name | IN("gopls-lsp", "php-lsp", "feature-dev", "context7", "playwright"))) \
+      | .plugins += [ \
+          {name: "victoriametrics", source: "./plugins/victoriametrics", description: "Query VictoriaMetrics: PromQL, series, alert rules"}, \
+          {name: "victorialogs", source: "./plugins/victorialogs", description: "Query VictoriaLogs with LogsQL"} \
+        ]' "$m" > /tmp/m.json \
     && mv /tmp/m.json "$m" \
-    && test "$(jq '.plugins | length' "$m")" = 5 \
+    && test "$(jq '.plugins | length' "$m")" = 7 \
     && p=/opt/claudetainer-plugins/external_plugins/playwright/.mcp.json \
     && jq '.playwright.command = "playwright-mcp" | .playwright.args = []' "$p" > /tmp/p.json \
     && mv /tmp/p.json "$p" \
@@ -293,7 +358,7 @@ RUN HOME=/opt/claude sh -c "mkdir -p /opt/claude && curl -fsSL https://claude.ai
 
 COPY rootfs/ /
 COPY --from=exporter /login-exporter /usr/local/bin/login-exporter
-RUN chmod 0755 /usr/local/bin/claudetainer-start /usr/local/lib/claudetainer/*.sh \
+RUN chmod 0755 /usr/local/bin/claudetainer-start /usr/local/bin/uvx /usr/local/lib/claudetainer/*.sh \
     && mkdir -p /workspace \
     && chown agent:agent /workspace /home/agent
 

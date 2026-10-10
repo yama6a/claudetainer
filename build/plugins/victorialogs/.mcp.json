@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "victorialogs": {
+      "command": "mcp-victorialogs",
+      "env": {
+        "VL_INSTANCE_ENTRYPOINT": "${VL_INSTANCE_ENTRYPOINT}"
+      }
+    }
+  }
+}

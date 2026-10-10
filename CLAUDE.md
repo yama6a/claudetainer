@@ -33,8 +33,8 @@ make smoke       # after any Dockerfile, rootfs or Go change
 - ASCII only, in code and docs.
 - Comments: zero by default. One line, only for a WHY the code cannot show: an outside constraint, a footgun, a
   coupling with another file.
-- A new tool: an `ARG` with its `# renovate:` line, an install for amd64 and arm64, and a probe in
-  `test/smoke.sh`.
+- A new tool: an `ARG` with its `# renovate:` line, an install for amd64 and arm64, a probe in
+  `test/smoke.sh`, and an entry in the tools table of `rootfs/etc/claude-code/CLAUDE.md`.
 - Never pass a global flag before `claude remote-control` in the start script. It refuses to start.
 - Never set `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC` or `DISABLE_GROWTHBOOK`. Either turns Remote Control off.
 - Never add a WorktreeRemove hook. `claude rc` runs it for every live session at shutdown, see

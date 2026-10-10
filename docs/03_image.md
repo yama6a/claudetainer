@@ -27,11 +27,14 @@ Every version is an `ARG` at the top of the `Dockerfile`, with a `# renovate:` l
 | Claude | Claude Code, root-owned in `/opt/claude`, updater off |
 | Kubernetes | kubectl, helm 4, kustomize, kubeconform, yq, kubectx, kubens, k9s |
 | Talos | talosctl |
-| Go | Go, gopls, golangci-lint, gofumpt, govulncheck, oapi-codegen |
+| Go | Go, gopls, golangci-lint, gofumpt, govulncheck, oapi-codegen, delve |
 | Node | nvm with Node 24 and 26, 26 the default |
 | PHP | mise with PHP 8.2 to 8.5, 8.5 the default. Composer, Xdebug and PCOV, Intelephense |
 | Build | build-essential, pkg-config, python3, perl |
-| Postgres | psql 18 from PGDG, pgcli |
+| Lint | shellcheck, shfmt, actionlint, hadolint, yamllint, prettier, Renovate |
+| Databases | psql 18 from PGDG, pgcli, sqlite3 |
+| Base extras | file, wget, zip, a `uvx` wrapper around `uv tool run` |
+| MCP servers | mcp-victoriametrics, mcp-victorialogs |
 | Browser | Playwright Chromium and the Playwright MCP server |
 | Metrics | `login-exporter`, built from `cmd/login-exporter/` in a Go stage of the same Dockerfile |
 
@@ -48,6 +51,9 @@ there.
 - The context7 plugin sends `${CONTEXT7_API_KEY}` from the environment upstream. The copy uses a headersHelper,
   `context7-headers.sh`, which reads the key from the Secret file. Without the file, context7 runs anonymously.
 - The browser comes from the MCP server's own Playwright, so its revision always matches the server.
+- Two plugins of our own, victoriametrics and victorialogs, live in `build/plugins/`. They run the pinned MCP
+  servers and read the server URLs from the pod environment. The start script installs each one only when the pod
+  sets its URL: `VM_INSTANCE_ENTRYPOINT`, or `VL_INSTANCE_ENTRYPOINT`. `VM_INSTANCE_TYPE` defaults to `single`.
 
 ## Decisions
 
@@ -72,6 +78,10 @@ there.
   one with `php -d` for a coverage run.
 - **One pinned Composer for all PHP versions.** vfox-php installs the newest Composer into each version, which
   nothing pins. The build removes those copies.
+- **Lint tools in the image.** Sessions installed shellcheck, shfmt, actionlint, hadolint and yamllint by hand,
+  again and again. These run the same checks as the org's shell and yaml CI jobs before a push.
+- **Renovate on Node 24.** Renovate refuses any other Node. Its wrappers in `/usr/local/bin` call Node 24
+  directly, so the session's default Node does not matter.
 - **build-essential.** Without a C compiler, `go test -race` fails, and the org's go-ci and Makefile template
   run tests with `-race`.
 - **No act.** The pod has no Docker daemon. The pod variant of the git-commit skill reads GitHub Actions results

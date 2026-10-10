@@ -89,6 +89,8 @@ login() {
 
 install_plugins() {
   local p
+  [ -z "${VM_INSTANCE_ENTRYPOINT:-}" ] || PLUGINS+=(victoriametrics)
+  [ -z "${VL_INSTANCE_ENTRYPOINT:-}" ] || PLUGINS+=(victorialogs)
   claude plugin marketplace add "$MARKETPLACE_DIR" > /dev/null 2>&1 \
     || claude plugin marketplace update "$MARKETPLACE" > /dev/null \
     || log "marketplace $MARKETPLACE could not be added or updated"

@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "victoriametrics": {
+      "command": "mcp-victoriametrics",
+      "env": {
+        "VM_INSTANCE_ENTRYPOINT": "${VM_INSTANCE_ENTRYPOINT}",
+        "VM_INSTANCE_TYPE": "${VM_INSTANCE_TYPE:-single}"
+      }
+    }
+  }
+}

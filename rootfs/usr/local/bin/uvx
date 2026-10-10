@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# The base image ships uv without its uvx companion binary.
+set -euo pipefail
+exec uv tool run "$@"

@@ -2,9 +2,9 @@
 
 # Global scope. Redeclare each ARG bare above the RUN that uses it, so a bump rebuilds from there down.
 # renovate: datasource=npm depName=@anthropic-ai/claude-code
-ARG CLAUDE_VERSION=2.1.295
+ARG CLAUDE_VERSION=2.1.296
 # renovate: datasource=git-refs depName=https://github.com/anthropics/claude-plugins-official branch=main
-ARG CLAUDE_PLUGINS_REF=8206942d3ec08519557bd750858d689d082bea7c
+ARG CLAUDE_PLUGINS_REF=b8e53f1c05dff3b6d751297f6527990ffc81c2f4
 # renovate: datasource=npm depName=@playwright/mcp
 ARG PLAYWRIGHT_MCP_VERSION=0.0.83
 # renovate: datasource=github-releases depName=kubernetes/kubernetes
@@ -46,7 +46,7 @@ ARG PGCLI_VERSION=4.7.1
 ARG PG_MAJOR=18
 
 # Cross-compiles on the build machine's architecture, so this stage needs no emulation.
-FROM --platform=$BUILDPLATFORM golang:1.27-alpine@sha256:738d1cf061836894ff6bb8c33881080ac66de8cf0586615012a0c8f592649cfa AS exporter
+FROM --platform=$BUILDPLATFORM golang:1.27-alpine@sha256:f92b6ef800e499660581efdabdf25d9d817a9d124eaf900924f0504e7e27e12d AS exporter
 ARG TARGETOS
 ARG TARGETARCH
 WORKDIR /src

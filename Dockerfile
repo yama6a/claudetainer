@@ -44,6 +44,26 @@ ARG NODE26_VERSION=v26.11.1
 # renovate: datasource=pypi depName=pgcli
 ARG PGCLI_VERSION=4.7.1
 ARG PG_MAJOR=18
+# renovate: datasource=github-releases depName=jdx/mise
+ARG MISE_VERSION=v2026.10.7
+# renovate: datasource=git-refs depName=https://github.com/jdx/vfox-php branch=main
+ARG VFOX_PHP_REF=1c4dcd66fce150d11e63ba57cd8a46dd20808139
+# renovate: datasource=github-tags depName=php/php-src
+ARG PHP82_VERSION=8.2.34
+# renovate: datasource=github-tags depName=php/php-src
+ARG PHP83_VERSION=8.3.35
+# renovate: datasource=github-tags depName=php/php-src
+ARG PHP84_VERSION=8.4.26
+# renovate: datasource=github-tags depName=php/php-src
+ARG PHP85_VERSION=8.5.11
+# renovate: datasource=github-tags depName=xdebug/xdebug
+ARG XDEBUG_VERSION=3.5.3
+# renovate: datasource=github-tags depName=krakjoe/pcov
+ARG PCOV_VERSION=v1.0.12
+# renovate: datasource=github-releases depName=composer/composer
+ARG COMPOSER_VERSION=2.10.3
+# renovate: datasource=npm depName=intelephense
+ARG INTELEPHENSE_VERSION=1.18.5
 
 # Cross-compiles on the build machine's architecture, so this stage needs no emulation.
 FROM --platform=$BUILDPLATFORM golang:1.27-alpine@sha256:f92b6ef800e499660581efdabdf25d9d817a9d124eaf900924f0504e7e27e12d AS exporter
@@ -55,9 +75,11 @@ RUN go mod download
 COPY cmd/ cmd/
 RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -trimpath -ldflags='-s -w' -o /login-exporter ./cmd/login-exporter
 
-FROM docker/sandbox-templates:claude-code-minimal-0.7.0@sha256:31176d2cbb07ba18a709f015bea0e6e3c56f6b7b92744d16309d94e905c91482
+FROM docker/sandbox-templates:claude-code-minimal-0.7.0@sha256:31176d2cbb07ba18a709f015bea0e6e3c56f6b7b92744d16309d94e905c91482 AS base
 
 ARG TARGETARCH
+# The build stages run as root. The final stage switches to agent at its end.
+# hadolint ignore=DL3002
 USER root
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ENV DEBIAN_FRONTEND=noninteractive
@@ -72,16 +94,67 @@ RUN SUDO_FORCE_REMOVE=yes apt-get purge -y sudo \
     && gpasswd -d agent docker \
     && sed -i '/Docker Sandbox/,/^export BASH_ENV/d' /etc/bash.bashrc
 
+# The PHP headers stay in the final image, because sessions compile further PHP versions without apt.
 ARG PG_MAJOR
 RUN apt-get update && apt-get install -y --no-install-recommends \
       build-essential gnupg perl pkg-config python3 \
+      autoconf bison re2c libbz2-dev libcurl4-openssl-dev libfreetype-dev libgmp-dev libicu-dev libjpeg-dev \
+      libonig-dev libpng-dev libreadline-dev libsodium-dev libsqlite3-dev libssl-dev libwebp-dev libxml2-dev \
+      libzip-dev \
     && install -m 0755 -d /etc/apt/keyrings \
     && curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc -o /etc/apt/keyrings/postgresql.asc \
     && echo "deb [arch=${TARGETARCH} signed-by=/etc/apt/keyrings/postgresql.asc] https://apt.postgresql.org/pub/repos/apt $(sed -n "s/^VERSION_CODENAME=//p" /etc/os-release)-pgdg main" \
       > /etc/apt/sources.list.d/pgdg.list \
     && apt-get update \
-    && apt-get install -y --no-install-recommends "postgresql-client-${PG_MAJOR}" \
+    && apt-get install -y --no-install-recommends "postgresql-client-${PG_MAJOR}" libpq-dev \
     && rm -rf /var/lib/apt/lists/*
+
+ENV MISE_DATA_DIR=/opt/mise \
+    MISE_CACHE_DIR=/workspace/.cache/mise
+
+ARG MISE_VERSION
+RUN case "${TARGETARCH}" in amd64) mise_arch=x64 ;; *) mise_arch="${TARGETARCH}" ;; esac \
+    && curl -fsSL -o /usr/local/bin/mise "https://github.com/jdx/mise/releases/download/${MISE_VERSION}/mise-${MISE_VERSION}-linux-${mise_arch}" \
+    && curl -fsSL "https://github.com/jdx/mise/releases/download/${MISE_VERSION}/SHASUMS256.txt" \
+      | sed -n "s|  \./mise-${MISE_VERSION}-linux-${mise_arch}\$|  /usr/local/bin/mise|p" | sha256sum -c - \
+    && chmod 0755 /usr/local/bin/mise
+
+ARG VFOX_PHP_REF
+RUN MISE_CACHE_DIR=/tmp/mise mise plugins install php "https://github.com/jdx/vfox-php#${VFOX_PHP_REF}" \
+    && rm -rf /tmp/mise
+
+# One stage per PHP version, so BuildKit compiles all four at the same time.
+FROM base AS php82
+ARG PHP82_VERSION
+ARG XDEBUG_VERSION
+ARG PCOV_VERSION
+RUN --mount=type=bind,source=build/php-install.sh,target=/php-install.sh \
+    bash /php-install.sh "${PHP82_VERSION}" "${XDEBUG_VERSION}" "${PCOV_VERSION#v}"
+
+FROM base AS php83
+ARG PHP83_VERSION
+ARG XDEBUG_VERSION
+ARG PCOV_VERSION
+RUN --mount=type=bind,source=build/php-install.sh,target=/php-install.sh \
+    bash /php-install.sh "${PHP83_VERSION}" "${XDEBUG_VERSION}" "${PCOV_VERSION#v}"
+
+FROM base AS php84
+ARG PHP84_VERSION
+ARG XDEBUG_VERSION
+ARG PCOV_VERSION
+RUN --mount=type=bind,source=build/php-install.sh,target=/php-install.sh \
+    bash /php-install.sh "${PHP84_VERSION}" "${XDEBUG_VERSION}" "${PCOV_VERSION#v}"
+
+FROM base AS php85
+ARG PHP85_VERSION
+ARG XDEBUG_VERSION
+ARG PCOV_VERSION
+RUN --mount=type=bind,source=build/php-install.sh,target=/php-install.sh \
+    bash /php-install.sh "${PHP85_VERSION}" "${XDEBUG_VERSION}" "${PCOV_VERSION#v}"
+
+FROM base
+ARG TARGETARCH
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 # kubectx ships x86_64 where the rest ship amd64.
 ARG KUBECTL_VERSION
@@ -147,7 +220,29 @@ RUN mkdir -p "${NVM_DIR}" \
     && nvm cache clear \
     && chown -R agent:agent "${NVM_DIR}"
 
-ENV PATH=/opt/nvm/current/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+COPY --from=php82 /opt/mise/installs/php /opt/mise/installs/php
+COPY --from=php83 /opt/mise/installs/php /opt/mise/installs/php
+COPY --from=php84 /opt/mise/installs/php /opt/mise/installs/php
+COPY --from=php85 /opt/mise/installs/php /opt/mise/installs/php
+# Like /opt/nvm, the pod user owns /opt/mise, so `mise install php@...` works in every session.
+RUN MISE_CACHE_DIR=/tmp/mise mise reshim \
+    && rm -rf /tmp/mise \
+    && chown -R agent:agent /opt/mise
+
+ENV PATH=/opt/mise/shims:/opt/nvm/current/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+ARG COMPOSER_VERSION
+RUN curl -fsSL -o /usr/local/bin/composer "https://getcomposer.org/download/${COMPOSER_VERSION}/composer.phar" \
+    && curl -fsSL "https://getcomposer.org/download/${COMPOSER_VERSION}/composer.phar.sha256sum" \
+      | sed 's|composer.phar$|/usr/local/bin/composer|' | sha256sum -c - \
+    && chmod 0755 /usr/local/bin/composer
+
+# Intelephense is the language server of the php-lsp plugin.
+ARG INTELEPHENSE_VERSION
+RUN npm install --prefix /opt/intelephense --no-audit --no-fund "intelephense@${INTELEPHENSE_VERSION}" \
+    && ln -s /opt/intelephense/node_modules/.bin/intelephense /usr/local/bin/intelephense \
+    && chmod -R a+rX /opt/intelephense \
+    && rm -rf /root/.npm
 
 # uv tools install under $HOME by default, which is per session here, so bake pgcli at a shared path.
 ARG PGCLI_VERSION
@@ -165,7 +260,7 @@ RUN npm install --prefix /opt/playwright-mcp --no-audit --no-fund "@playwright/m
     && rm -rf /var/lib/apt/lists/* /root/.npm
 
 # The marketplace is renamed because Claude Code reserves claude-plugins-official for the GitHub source.
-# Only the four plugins the pod enables are kept. playwright runs the pinned server above, not @latest, and
+# Only the five plugins the pod enables are kept. playwright runs the pinned server above, not @latest, and
 # context7 reads its API key from a Secret file through a headersHelper, not from an environment variable.
 ARG CLAUDE_PLUGINS_REF
 RUN mkdir -p /opt/claudetainer-plugins \
@@ -174,12 +269,13 @@ RUN mkdir -p /opt/claudetainer-plugins \
         "claude-plugins-official-${CLAUDE_PLUGINS_REF}/.claude-plugin" \
         "claude-plugins-official-${CLAUDE_PLUGINS_REF}/plugins/gopls-lsp" \
         "claude-plugins-official-${CLAUDE_PLUGINS_REF}/plugins/feature-dev" \
+        "claude-plugins-official-${CLAUDE_PLUGINS_REF}/plugins/php-lsp" \
         "claude-plugins-official-${CLAUDE_PLUGINS_REF}/external_plugins/context7" \
         "claude-plugins-official-${CLAUDE_PLUGINS_REF}/external_plugins/playwright" \
     && m=/opt/claudetainer-plugins/.claude-plugin/marketplace.json \
-    && jq '.name = "claudetainer-plugins" | .plugins |= map(select(.name | IN("gopls-lsp", "feature-dev", "context7", "playwright")))' "$m" > /tmp/m.json \
+    && jq '.name = "claudetainer-plugins" | .plugins |= map(select(.name | IN("gopls-lsp", "php-lsp", "feature-dev", "context7", "playwright")))' "$m" > /tmp/m.json \
     && mv /tmp/m.json "$m" \
-    && test "$(jq '.plugins | length' "$m")" = 4 \
+    && test "$(jq '.plugins | length' "$m")" = 5 \
     && p=/opt/claudetainer-plugins/external_plugins/playwright/.mcp.json \
     && jq '.playwright.command = "playwright-mcp" | .playwright.args = []' "$p" > /tmp/p.json \
     && mv /tmp/p.json "$p" \
@@ -214,6 +310,9 @@ ENV LANG=C.UTF-8 \
     GOMODCACHE=/workspace/.cache/go-mod \
     GOCACHE=/workspace/.cache/go-build \
     npm_config_cache=/workspace/.cache/npm \
+    COMPOSER_CACHE_DIR=/workspace/.cache/composer \
+    COMPOSER_MEMORY_LIMIT=1G \
+    PHP_INI_SCAN_DIR=:/etc/php/claudetainer \
     UV_CACHE_DIR=/workspace/.cache/uv \
     PLAYWRIGHT_MCP_BROWSER=chromium \
     PLAYWRIGHT_MCP_HEADLESS=true \

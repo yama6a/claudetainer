@@ -29,5 +29,5 @@ Change the `ARG` value, `make smoke`, open a PR. The merge releases and deploys,
 
 ## Roll back
 
-Revert the deploy PR in offgrid-private, see [05_deployment.md](05_deployment.md). Then revert or fix the change
+Revert the deploy PR in the GitOps repo, see [05_deployment.md](05_deployment.md). Then revert or fix the change
 here, so the next release does not bring it back.

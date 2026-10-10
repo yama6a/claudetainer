@@ -29,6 +29,7 @@ Every version is an `ARG` at the top of the `Dockerfile`, with a `# renovate:` l
 | Talos | talosctl |
 | Go | Go, gopls, golangci-lint, gofumpt, govulncheck, oapi-codegen |
 | Node | nvm with Node 24 and 26, 26 the default |
+| PHP | mise with PHP 8.2 to 8.5, 8.5 the default. Composer, Xdebug and PCOV, Intelephense |
 | Build | build-essential, pkg-config, python3, perl |
 | Postgres | psql 18 from PGDG, pgcli |
 | Browser | Playwright Chromium and the Playwright MCP server |
@@ -36,7 +37,7 @@ Every version is an `ARG` at the top of the `Dockerfile`, with a `# renovate:` l
 
 ## Plugins
 
-The four official plugins, gopls-lsp, feature-dev, context7 and playwright, come from a copy of Anthropic's
+The five official plugins, gopls-lsp, php-lsp, feature-dev, context7 and playwright, come from a copy of Anthropic's
 marketplace vendored at a pinned commit in `/opt/claudetainer-plugins`. The start script installs them from
 there.
 
@@ -60,6 +61,17 @@ there.
   seeds config from bind mounts.
 - **nvm with 24 and 26.** Your repos pin Node 24 in `.nvmrc`, and CI runs that. 26 is the default for everything
   else.
+- **PHP compiled from source with mise.** Prebuilt static PHP has no pdo_pgsql, no pdo_sqlite and cannot load
+  Xdebug or PCOV. The Ondrej apt repository has no Ubuntu 26.04 builds, and sessions have no apt anyway. mise
+  with the vfox-php plugin compiles any version, also inside a session, because the image keeps the headers.
+  Cost: each version compiles for about 10 to 20 minutes per architecture. One build stage per version lets
+  BuildKit compile all four at the same time.
+- **PHP `memory_limit` at 1G.** One PHP process can no longer fill the pod's memory on its own. Sessions raise it
+  per command only. `COMPOSER_MEMORY_LIMIT` is 1G too, because Composer raises its own limit to 1.5G otherwise.
+- **Xdebug and PCOV built, not loaded.** Loaded, each slows every PHP command and adds memory. A session loads
+  one with `php -d` for a coverage run.
+- **One pinned Composer for all PHP versions.** vfox-php installs the newest Composer into each version, which
+  nothing pins. The build removes those copies.
 - **build-essential.** Without a C compiler, `go test -race` fails, and the org's go-ci and Makefile template
   run tests with `-race`.
 - **No act.** The pod has no Docker daemon. The pod variant of the git-commit skill reads GitHub Actions results
@@ -73,7 +85,7 @@ there.
 | Workflow | When | Does |
 |---|---|---|
 | `ci.yaml` | PRs and main | gha go-ci for the exporter, gha shell and yaml checks, the Renovate config check, and on PRs a native build of each architecture followed by `test/smoke.sh` |
-| `build-push.yaml` | main | `docker-build-release-multiarch.yaml@v2`, then `deploy-gitops.yaml@v2` into offgrid-private |
+| `build-push.yaml` | main | `docker-build-release-multiarch.yaml@v2`, then `deploy-gitops.yaml@v2` into the GitOps repo |
 | `renovate.yaml` | nightly | gha's Renovate caller |
 
 The build runs natively per architecture, because the apt and Playwright installs are slow and fragile under

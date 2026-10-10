@@ -8,7 +8,7 @@ SECRETS=/etc/claudetainer/secrets         # one read-only Secret volume per subf
 USER_CONFIG=/etc/claudetainer/user-config # the personal-config ConfigMap
 MARKETPLACE_DIR=/opt/claudetainer-plugins # vendored in the image
 MARKETPLACE=claudetainer-plugins
-PLUGINS=(gopls-lsp feature-dev context7 playwright)
+PLUGINS=(gopls-lsp php-lsp feature-dev context7 playwright)
 
 log() { printf 'claudetainer-start: %s\n' "$*" >&2; }
 die() {

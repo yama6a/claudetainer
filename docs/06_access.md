@@ -7,7 +7,7 @@ What a session can reach, with which credential, and the risks accepted with it.
 
 | Credential | Secret | Grants |
 |---|---|---|
-| Fine-grained GitHub PAT on yama6a | `claudetainer-github` | on the repos you pick, offgrid-private included: Contents, Pull requests and Workflows read/write, Actions and Metadata read |
+| Fine-grained GitHub PAT on yama6a | `claudetainer-github` | on the repos you pick, the GitOps repo included: Contents, Pull requests and Workflows read/write, Actions and Metadata read |
 | SSH signing key | `claudetainer-signing-key` | signs commits as you. Registered on GitHub as a signing key only |
 | Claude login | `claudetainer-claude-login` | the Max subscription, see [04_login.md](04_login.md) |
 | ServiceAccount `claudetainer` | none, projected token | cluster-admin |
@@ -65,7 +65,7 @@ A session runs in bypass mode, so a prompt injection in a cloned repo or a fetch
 above. It can:
 
 - act as cluster admin, and delete volumes whose data Argo CD cannot restore.
-- push to offgrid-private's main, which needs no PR and no review. Argo CD applies it to the cluster.
+- push to the GitOps repo's main, which needs no PR and no review. Argo CD applies it to the cluster.
 - push a branch whose workflow reads repo secrets such as DEPLOY_TOKEN.
 - reach Argo CD's API, which grants admin to anonymous callers inside the cluster.
 - read or change every other session's folder, since all sessions run as one user.

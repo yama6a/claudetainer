@@ -57,5 +57,36 @@
       matchCurrentValue: "/^v26\\./",
       allowedVersions: "/^v26\\./",
     },
+    {
+      // Four ARGs track php/php-src. Each stays on its own minor, which the image offers through mise.
+      description: "php-src tags are php-X.Y.Z, the ARGs are X.Y.Z",
+      matchDepNames: ["php/php-src"],
+      extractVersion: "^php-(?<version>\\d+\\.\\d+\\.\\d+)$",
+    },
+    {
+      description: "php 8.2 stays on 8.2",
+      matchDepNames: ["php/php-src"],
+      matchCurrentValue: "/^8\\.2\\./",
+      allowedVersions: "/^8\\.2\\./",
+    },
+    {
+      description: "php 8.3 stays on 8.3",
+      matchDepNames: ["php/php-src"],
+      matchCurrentValue: "/^8\\.3\\./",
+      allowedVersions: "/^8\\.3\\./",
+    },
+    {
+      description: "php 8.4 stays on 8.4",
+      matchDepNames: ["php/php-src"],
+      matchCurrentValue: "/^8\\.4\\./",
+      allowedVersions: "/^8\\.4\\./",
+    },
+    {
+      // 8.5 is also the default in rootfs/etc/mise/config.toml, so a new minor needs a hand-made change there.
+      description: "php 8.5 stays on 8.5",
+      matchDepNames: ["php/php-src"],
+      matchCurrentValue: "/^8\\.5\\./",
+      allowedVersions: "/^8\\.5\\./",
+    },
   ],
 }

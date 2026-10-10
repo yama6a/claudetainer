@@ -10,6 +10,14 @@ arg() { sed -n "s/^ARG $1=//p" "$root/Dockerfile"; }
 probes="$(
   docker run --rm --entrypoint bash "$image" -c '
     p() { printf "%s\t%s\n" "$1" "$(eval "$2" 2>&1 | tr "\n\t" "  ")"; }
+    phpv() {
+      MISE_PHP_VERSION=$1 php -d zend_extension=xdebug -d extension=pcov -r "
+        \$m = array_filter([\"pdo_pgsql\", \"pdo_sqlite\", \"pdo_mysql\", \"intl\", \"gd\", \"zip\", \"sodium\", \"gmp\",
+          \"bz2\", \"mbstring\", \"curl\", \"openssl\", \"readline\"], fn (\$e) => !extension_loaded(\$e));
+        echo PHP_VERSION, \" \", phpversion(\"xdebug\"), \" \", phpversion(\"pcov\"), \" \",
+          \$m ? \"missing:\" . implode(\",\", \$m) : \"ext-ok\";"
+    }
+    phpini() { php -r "echo ini_get(\"$1\");"; }
     p claude "claude --version"
     p kubectl "kubectl version --client"
     p helm "helm version --short"
@@ -31,6 +39,17 @@ probes="$(
     p node-path "command -v node"
     p nvm ". /opt/nvm/nvm.sh --no-use && nvm --version"
     p nvm-ls ". /opt/nvm/nvm.sh --no-use && nvm ls --no-colors"
+    p mise "mise --version"
+    p php-path "command -v php"
+    p php-default "php -v"
+    p php82 "phpv 8.2"
+    p php83 "phpv 8.3"
+    p php84 "phpv 8.4"
+    p php85 "phpv 8.5"
+    p php-memory "phpini memory_limit"
+    p composer "composer --version"
+    p intelephense "command -v intelephense && jq -r .version /opt/intelephense/node_modules/intelephense/package.json"
+    p php-lsp-plugin "jq -r .plugins[].name /opt/claudetainer-plugins/.claude-plugin/marketplace.json"
     p psql "psql --version"
     p pgcli "pgcli --version"
     p python3 "python3 --version"
@@ -87,6 +106,18 @@ expect node "$(arg NODE26_VERSION)"
 expect node-path /opt/nvm/current/bin/node
 expect nvm "$(arg NVM_VERSION | sed 's/^v//')"
 expect nvm-ls "$(arg NODE24_VERSION)"
+expect mise "$(arg MISE_VERSION | sed 's/^v//') "
+expect php-path /opt/mise/shims/php
+expect php-default "PHP $(arg PHP85_VERSION) "
+pcov="$(arg PCOV_VERSION | sed 's/^v//')"
+expect php82 "$(arg PHP82_VERSION) $(arg XDEBUG_VERSION) $pcov ext-ok"
+expect php83 "$(arg PHP83_VERSION) $(arg XDEBUG_VERSION) $pcov ext-ok"
+expect php84 "$(arg PHP84_VERSION) $(arg XDEBUG_VERSION) $pcov ext-ok"
+expect php85 "$(arg PHP85_VERSION) $(arg XDEBUG_VERSION) $pcov ext-ok"
+expect php-memory 1G
+expect composer "Composer version $(arg COMPOSER_VERSION) "
+expect intelephense "$(arg INTELEPHENSE_VERSION)"
+expect php-lsp-plugin php-lsp
 expect psql " $(arg PG_MAJOR)."
 expect pgcli "$(arg PGCLI_VERSION)"
 expect python3 "Python 3."

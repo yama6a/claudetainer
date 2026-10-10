@@ -7,7 +7,7 @@ Why the login works this way: [../04_login.md](../04_login.md).
 Do this for the first deploy, and again before the refresh token expires, about every 30 days.
 
 1. Log in inside a throwaway container, so the login never touches your laptop's own. On macOS a login outside a
-   container goes to the Keychain, not to a file. Run from a checkout of offgrid-private:
+   container goes to the Keychain, not to a file. Run from a checkout of the GitOps repo:
 
    ```bash
    mkdir -m 0700 login
@@ -39,7 +39,7 @@ Do this for the first deploy, and again before the refresh token expires, about 
 
    kubeseal writes the whole file, so the comment block at its top is gone. Put it back from git if you want it.
 
-4. Commit and push offgrid-private. Reloader restarts the pod once Argo CD syncs the SealedSecret.
+4. Commit and push the GitOps repo. Reloader restarts the pod once Argo CD syncs the SealedSecret.
 
 5. Check the pod logged in:
 

@@ -1,13 +1,13 @@
 # Runbook: Access
 
 Why each credential has the scope it has: [../06_access.md](../06_access.md). Run every step from a checkout of
-offgrid-private. Each step leaves a SealedSecret to commit.
+the GitOps repo. Each step leaves a SealedSecret to commit.
 
 ## GitHub PAT
 
 1. Create a fine-grained token at GitHub, Settings, Developer settings, Fine-grained tokens:
    - Resource owner: `yama6a`.
-   - Repository access: the repos sessions may work on, offgrid-private included.
+   - Repository access: the repos sessions may work on, the GitOps repo included.
    - Permissions: Contents, Pull requests and Workflows read and write. Actions and Metadata read.
 2. Save it to a file and seal it:
 

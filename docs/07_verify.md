@@ -15,7 +15,7 @@ Each one names what changes when it fails.
 | 8 | The picker shows the server as `claudetainer` | TODO |
 | 9 | The SessionStart hook receives a per-session `CLAUDE_ENV_FILE` in server-spawned sessions | TODO |
 | 10 | The Playwright MCP server starts Chromium in the pod | TODO |
-| 11 | The four plugins install from `/opt/claudetainer-plugins` at start | TODO |
+| 11 | The five plugins install from `/opt/claudetainer-plugins` at start | TODO |
 | 12 | With Trusted Devices turned on, the pod's login still works | TODO, only if you turn it on |
 | 13 | Claude Code runs the plugin's headersHelper, and context7 calls carry the key | TODO |
 | 14 | vmagent scrapes the login exporter, and Grafana loads the rule `claudetainer-login-expiring` | TODO |
@@ -84,7 +84,7 @@ kubectl config view --minify -o jsonpath='{.contexts[0].context.namespace}'
 claude plugin list
 ```
 
-Expected: HOME under the session folder, namespace `claudetainer-scratch`, four plugins enabled, and no
+Expected: HOME under the session folder, namespace `claudetainer-scratch`, five plugins enabled, and no
 permission prompt at any point. Then ask it to open a page with the Playwright tools.
 
 ## 13. Context7 key

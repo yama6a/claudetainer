@@ -64,7 +64,7 @@ image:
 ci: tidy-check generate-check fmt-check lint vet test vuln
 
 # ---- claudetainer ----
-SHELL_FILES := rootfs/usr/local/bin/claudetainer-start $(wildcard rootfs/usr/local/lib/claudetainer/*.sh) test/smoke.sh
+SHELL_FILES := rootfs/usr/local/bin/claudetainer-start $(wildcard rootfs/usr/local/lib/claudetainer/*.sh) $(wildcard build/*.sh) test/smoke.sh
 
 .PHONY: lint-image smoke
 

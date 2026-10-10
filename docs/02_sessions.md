@@ -12,8 +12,9 @@ in [runbooks/02_sessions.md](runbooks/02_sessions.md).
 | `/workspace/sessions/bridge-<id>/` | one on-demand session: its clones | the sweep, 30 days after its last transcript write |
 | `/workspace/sessions/scheduled-<name>-<time>/` | one scheduled session: its clones | the sweep, 30 days after its last transcript write |
 | `<session folder>/.home/` | that session's HOME: GOPATH, `~/.local`, its kubeconfig | with its folder |
-| `/workspace/.cache/` | Go module and build caches, npm and uv caches, shared | the sweep, whole, above 20 GiB |
+| `/workspace/.cache/` | Go module and build caches, npm, uv, Composer and mise caches, shared | the sweep, whole, above 20 GiB |
 | `/opt/nvm/` | Node 24 and 26, and whatever `npm install -g` adds | the next pod restart |
+| `/opt/mise/` | PHP 8.2 to 8.5, and whatever `mise install` adds | the next pod restart |
 | `~/.claude/projects/` | transcripts, one folder per session folder | Claude Code, after 365 days |
 
 The volume is 100 GiB, see [05_deployment.md](05_deployment.md).

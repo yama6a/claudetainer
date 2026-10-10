@@ -9,6 +9,7 @@ built.
 |---|---|
 | `Dockerfile` | the image. Every pinned version is an `ARG` at the top, with a `# renovate:` line above it |
 | `rootfs/` | copied to `/` in the image: the start script, hook scripts, managed settings, the pod CLAUDE.md |
+| `build/` | scripts the Dockerfile runs during the build only, such as the PHP compile |
 | `cmd/login-exporter/` | the sidecar that serves the login expiry as metrics. Go, org conventions |
 | `test/smoke.sh` | checks a built image: every tool, its exact version, its path |
 | `renovate.json5` | which manager owns which pin |
@@ -46,6 +47,7 @@ make smoke       # after any Dockerfile, rootfs or Go change
 |---|---|
 | Tool versions, the base image digest, the plugin marketplace commit | `Dockerfile` `ARG`s and `FROM` |
 | Session rules: sweep age, cache limit | knobs in `rootfs/usr/local/lib/claudetainer/sweep.sh` |
+| The default PHP version, PHP's `memory_limit` | `rootfs/etc/mise/config.toml`, `rootfs/etc/php/claudetainer/` |
 | claudetainer's hooks, transcript retention | `rootfs/etc/claude-code/managed-settings.json` |
 | Pod resources, volumes, identity, scratch quota | `values.yaml` of the chart in offgrid-private |
 | Personal Claude config | `files/claude/` of the chart in offgrid-private |

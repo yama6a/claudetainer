@@ -11,7 +11,7 @@ the Claude app. The pod holds the tools, the clones and the credentials. There i
 | Session | a child process of the server | works in its own folder under `/workspace/sessions/` |
 | Hook scripts | `/usr/local/lib/claudetainer/` in the image | give each session a folder and a HOME, and sweep old folders |
 | Pod | Deployment `claudetainer`, namespace `claudetainer`, `replicas: 1` | one server, every session |
-| Chart | `argo_apps/workloads/charts/claudetainer/` in offgrid-private | the pod, its volumes, secrets, RBAC and the scratch namespace |
+| Chart | `argo_apps/workloads/charts/claudetainer/` in the GitOps repo | the pod, its volumes, secrets, RBAC and the scratch namespace |
 
 Remote Control (RC) is Claude Code's own bridge to claude.ai. The server only makes outbound HTTPS calls to
 `api.anthropic.com`, so the pod needs no ingress, no hostname and no SSO entry.

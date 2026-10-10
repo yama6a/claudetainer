@@ -5,5 +5,5 @@
 *.local
 /.build/
 /cover.out
-# Holds copies of personal Claude config for offgrid-private, so it must never reach this public repo.
+# Holds copies of personal Claude config for the GitOps repo, so it must never reach this public repo.
 chart-draft/

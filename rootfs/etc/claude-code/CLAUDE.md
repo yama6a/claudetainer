@@ -57,5 +57,5 @@ All sessions share one memory limit. When the pod reaches it, the pod restarts a
 
 - kubectl has cluster-admin. The default namespace is `claudetainer-scratch`.
 - Deploy experiments to `claudetainer-scratch` only. Its quota is small. Objects older than 7 days are deleted.
-- Change other namespaces only when the user asks. Pull requests to `yama6a/offgrid-private` manage the live
+- Change other namespaces only when the user asks. Pull requests to the cluster's GitOps repo manage the live
   cluster, and Argo CD reverts manual changes.

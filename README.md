@@ -6,8 +6,9 @@ Claude Code sessions that run in the homelab cluster, driven from claude.ai/code
 - Each session works in its own folder, with airlock's tools, a GitHub login that signs commits, and kubectl.
 - Sessions survive pod restarts: the server brings them back when it starts again.
 
-This repo builds the image `ghcr.io/yama6a/claudetainer`. The Kubernetes manifests live in offgrid-private. A
-draft of them sits in `chart-draft/`, which git ignores because it holds a copy of personal Claude config.
+This repo builds the image `ghcr.io/yama6a/claudetainer`. The Kubernetes manifests live in a private GitOps repo,
+which Argo CD deploys the cluster from. A draft of them sits in `chart-draft/`, which git ignores because it holds
+a copy of personal Claude config.
 
 ## Docs
 

@@ -1,6 +1,6 @@
 # Deployment
 
-The chart lives in offgrid-private at `argo_apps/workloads/charts/claudetainer/`. This repo carries a draft of it
+The chart lives in the GitOps repo at `argo_apps/workloads/charts/claudetainer/`. This repo carries a draft of it
 in `chart-draft/`, which git ignores. Procedures are in [runbooks/05_deployment.md](runbooks/05_deployment.md).
 
 ## Resources
@@ -45,10 +45,10 @@ rules, plus `inputNeededNotifEnabled: true`. Its plugin names point at `claudeta
 
 ## Decisions
 
-- **The chart in offgrid-private, not here.** App repos ship no manifests. Argo CD reconciles offgrid-private.
+- **The chart in the GitOps repo, not here.** App repos ship no manifests. Argo CD reconciles the GitOps repo.
 - **Two volumes.** The config is small and has no other copy, so it gets the backed-up class and deletion
   protection. The workspace is rebuilt by cloning again, so it gets the general-purpose class. `-local` is
-  reserved for small volumes by offgrid-private's storage doc: it copies the whole volume on every reschedule.
+  reserved for small volumes by the GitOps repo's storage doc: it copies the whole volume on every reschedule.
 - **10 GiB config.** The laptop writes about 0.5 GiB of transcripts a month. 365-day retention needs about 6 GiB.
 - **The ConfigMap over a copy in the image.** Your config changes more often than the tools. Cost: every change
   restarts all sessions.

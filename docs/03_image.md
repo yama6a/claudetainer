@@ -85,7 +85,7 @@ there.
 | Workflow | When | Does |
 |---|---|---|
 | `ci.yaml` | PRs and main | gha go-ci for the exporter, gha shell and yaml checks, the Renovate config check, and on PRs a native build of each architecture followed by `test/smoke.sh` |
-| `build-push.yaml` | main | `docker-build-release-multiarch.yaml@v2`, then `deploy-gitops.yaml@v2` into offgrid-private |
+| `build-push.yaml` | main | `docker-build-release-multiarch.yaml@v2`, then `deploy-gitops.yaml@v2` into the GitOps repo |
 | `renovate.yaml` | nightly | gha's Renovate caller |
 
 The build runs natively per architecture, because the apt and Playwright installs are slow and fragile under

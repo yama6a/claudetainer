@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# CronJob body: deletes every top-level object in the scratch namespace older than MAX_AGE_DAYS.
+# CronJob body: deletes every top-level object in the scratch namespace older than MAX_AGE_DAYS, and every
+# finished pod. A finished pod is never ready again, so it trips the cluster's pod-not-ready alert.
 # Garbage collection removes the children, so objects with an owner are left alone.
 set -uo pipefail
 
@@ -11,7 +12,7 @@ failed=0
 # Argo CD tracks by annotation here, so that annotation marks what the chart owns.
 select_stale='
   .items[]
-  | select(.metadata.creationTimestamp < $cutoff)
+  | select(.metadata.creationTimestamp < $cutoff or (.kind == "Pod" and (.status.phase | IN("Succeeded", "Failed"))))
   | select((.metadata.ownerReferences // []) | length == 0)
   | select(.metadata.annotations["argocd.argoproj.io/tracking-id"] == null)
   | select((.kind == "ConfigMap" and .metadata.name == "kube-root-ca.crt") | not)

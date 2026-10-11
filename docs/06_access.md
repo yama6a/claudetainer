@@ -42,8 +42,10 @@ kubeconfig defaults to it. Nothing enforces it: cluster-admin reaches every name
 | LoadBalancer and NodePort Services | 0 |
 | container defaults | 50m and 64 MiB requested, 256 MiB limit |
 
-The CronJob `claudetainer-scratch-wipe` deletes every object older than 7 days. It skips objects Argo CD manages,
-objects with an owner, which garbage collection removes, and `kube-root-ca.crt` and the default ServiceAccount.
+The CronJob `claudetainer-scratch-wipe` deletes every object older than 7 days, and every finished pod at any age.
+A finished pod is never ready again, so it fires the cluster's pod-not-ready alert until someone deletes it. The
+wipe skips objects Argo CD manages, objects with an owner, which garbage collection removes, and `kube-root-ca.crt`
+and the default ServiceAccount.
 
 ## Decisions
 

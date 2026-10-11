@@ -58,5 +58,13 @@ All sessions share one memory limit. When the pod reaches it, the pod restarts a
 
 - kubectl has cluster-admin. The default namespace is `claudetainer-scratch`.
 - Deploy experiments to `claudetainer-scratch` only. Its quota is small. Objects older than 7 days are deleted.
+- Query VictoriaMetrics and VictoriaLogs through their MCP tools. For an endpoint the tools lack, curl
+  `$VM_INSTANCE_ENTRYPOINT` or `$VL_INSTANCE_ENTRYPOINT` from this pod. Never start a pod to query them.
+- Start a scratch pod only for what this pod cannot do: run a container image, or test on a node of another
+  architecture or under a memory limit. For another in-cluster service, use `kubectl port-forward` from here.
+- Delete every scratch pod you start before you finish, then check with `kubectl get pods`. A finished pod that
+  stays behind fires the pod-not-ready alert.
+- Never pipe `kubectl run --rm` into another command. If the reader exits early, kubectl dies before it deletes
+  the pod.
 - Change other namespaces only when the user asks. Pull requests to the cluster's GitOps repo manage the live
   cluster, and Argo CD reverts manual changes.

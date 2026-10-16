@@ -2,15 +2,15 @@
 
 # Global scope. Redeclare each ARG bare above the RUN that uses it, so a bump rebuilds from there down.
 # renovate: datasource=npm depName=@anthropic-ai/claude-code
-ARG CLAUDE_VERSION=2.1.299
+ARG CLAUDE_VERSION=2.1.301
 # renovate: datasource=git-refs depName=https://github.com/anthropics/claude-plugins-official branch=main
-ARG CLAUDE_PLUGINS_REF=8bd00f08f0b04705e610cf132fbe2cf5ec44cfe3
+ARG CLAUDE_PLUGINS_REF=ea10b213686c90bb1984b2016937310e05336cf3
 # renovate: datasource=npm depName=@playwright/mcp
 ARG PLAYWRIGHT_MCP_VERSION=0.0.83
 # renovate: datasource=github-releases depName=kubernetes/kubernetes
 ARG KUBECTL_VERSION=v1.37.1
 # renovate: datasource=github-releases depName=helm/helm
-ARG HELM_VERSION=v4.3.0
+ARG HELM_VERSION=v4.3.1
 # renovate: datasource=github-releases depName=derailed/k9s
 ARG K9S_VERSION=v0.51.0
 # renovate: datasource=github-releases depName=kubernetes-sigs/kustomize
@@ -22,13 +22,13 @@ ARG KUBECONFORM_VERSION=v0.8.0
 # renovate: datasource=github-releases depName=mikefarah/yq
 ARG YQ_VERSION=v4.54.1
 # renovate: datasource=github-releases depName=siderolabs/talos
-ARG TALOSCTL_VERSION=v1.14.2
+ARG TALOSCTL_VERSION=v1.14.3
 # renovate: datasource=github-releases depName=golangci/golangci-lint
 ARG GOLANGCI_LINT_VERSION=2.14.0
 # renovate: datasource=github-tags depName=golang/go versioning=regex:^go(?<major>\d+)\.(?<minor>\d+)(\.(?<patch>\d+))?$
 ARG GO_VERSION=go1.27.2
 # renovate: datasource=go depName=golang.org/x/tools/gopls
-ARG GOPLS_VERSION=v0.23.0
+ARG GOPLS_VERSION=v0.24.0
 # renovate: datasource=go depName=github.com/oapi-codegen/oapi-codegen/v2
 ARG OAPI_CODEGEN_VERSION=v2.8.0
 # renovate: datasource=go depName=mvdan.cc/gofumpt
@@ -38,14 +38,14 @@ ARG GOVULNCHECK_VERSION=v1.9.0
 # renovate: datasource=github-releases depName=nvm-sh/nvm
 ARG NVM_VERSION=v0.40.8
 # renovate: datasource=github-tags depName=nodejs/node
-ARG NODE24_VERSION=v24.21.0
+ARG NODE24_VERSION=v24.22.0
 # renovate: datasource=github-tags depName=nodejs/node
-ARG NODE26_VERSION=v26.11.1
+ARG NODE26_VERSION=v26.12.0
 # renovate: datasource=pypi depName=pgcli
 ARG PGCLI_VERSION=4.7.1
 ARG PG_MAJOR=18
 # renovate: datasource=github-releases depName=jdx/mise
-ARG MISE_VERSION=v2026.10.9
+ARG MISE_VERSION=v2026.10.11
 # renovate: datasource=git-refs depName=https://github.com/jdx/vfox-php branch=main
 ARG VFOX_PHP_REF=1c4dcd66fce150d11e63ba57cd8a46dd20808139
 # renovate: datasource=github-tags depName=php/php-src
@@ -75,7 +75,7 @@ ARG HADOLINT_VERSION=v2.15.1
 # renovate: datasource=pypi depName=yamllint
 ARG YAMLLINT_VERSION=1.38.0
 # renovate: datasource=npm depName=renovate
-ARG RENOVATE_VERSION=44.156.1
+ARG RENOVATE_VERSION=44.164.9
 # renovate: datasource=npm depName=prettier
 ARG PRETTIER_VERSION=3.9.10
 # renovate: datasource=github-releases depName=go-delve/delve

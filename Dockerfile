@@ -45,7 +45,7 @@ ARG NODE26_VERSION=v26.12.0
 ARG PGCLI_VERSION=4.7.1
 ARG PG_MAJOR=18
 # renovate: datasource=github-releases depName=jdx/mise
-ARG MISE_VERSION=v2026.10.12
+ARG MISE_VERSION=v2026.10.13
 # renovate: datasource=git-refs depName=https://github.com/jdx/vfox-php branch=main
 ARG VFOX_PHP_REF=1c4dcd66fce150d11e63ba57cd8a46dd20808139
 # renovate: datasource=github-tags depName=php/php-src
@@ -75,7 +75,7 @@ ARG HADOLINT_VERSION=v2.15.1
 # renovate: datasource=pypi depName=yamllint
 ARG YAMLLINT_VERSION=1.38.0
 # renovate: datasource=npm depName=renovate
-ARG RENOVATE_VERSION=44.165.2
+ARG RENOVATE_VERSION=44.167.0
 # renovate: datasource=npm depName=prettier
 ARG PRETTIER_VERSION=3.9.10
 # renovate: datasource=github-releases depName=go-delve/delve

@@ -17,7 +17,6 @@ case "$name" in
   bridge-*)
     dir="$SESSIONS/$name"
     mkdir -p "$dir"
-    setsid /usr/local/lib/claudetainer/sweep.sh > /dev/null 2>&1 < /dev/null &
     ;;
   # A hook replaces git worktrees for every caller, so subagent isolation gets the git worktree it expects.
   *)

@@ -108,7 +108,5 @@ write_gh_config
 login
 install_plugins
 
-setsid /usr/local/lib/claudetainer/sweep.sh > /dev/null 2>&1 < /dev/null &
-
 cd "$SERVER_DIR"
 exec claude remote-control --spawn worktree --permission-mode bypassPermissions

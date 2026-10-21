@@ -23,11 +23,14 @@ The transcript folder `-workspace-sessions-bridge-<id>` belongs to `/workspace/s
 
 ## Free disk now
 
-The sweep runs at most once an hour. To run it at once, delete its stamp first:
+Run the daily sweep at once:
 
 ```bash
-kubectl -n claudetainer exec deploy/claudetainer -- sh -c 'rm -f /workspace/.sweep.stamp && /usr/local/lib/claudetainer/sweep.sh'
+kubectl -n claudetainer create job --from=cronjob/claudetainer-sweep sweep-manual
+kubectl -n claudetainer logs -f job/sweep-manual
 ```
+
+Expected: one `sweep: <folder>: archived, removed` line per folder it deleted.
 
 To delete one folder by hand, archive its session in claude.ai first, then:
 

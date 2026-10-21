@@ -9,8 +9,9 @@ in [runbooks/02_sessions.md](runbooks/02_sessions.md).
 |---|---|---|
 | `/workspace/sessions/home/` | the server's own folder, and the session it pre-creates at start | never, it is fixed |
 | `/workspace/sessions/home/*` | whatever that session cloned | the sweep, 30 days after the newest file changed |
-| `/workspace/sessions/bridge-<id>/` | one on-demand session: its clones | the sweep, 30 days after its last transcript write |
-| `/workspace/sessions/scheduled-<name>-<time>/` | one scheduled session: its clones | the sweep, 30 days after its last transcript write |
+| `/workspace/sessions/bridge-<id>/` | one on-demand session: its clones | the sweep, once claude.ai reports the session archived or deleted |
+| `/workspace/sessions/scheduled-<name>-<time>/` | one scheduled session: its clones | the sweep, once claude.ai reports the session archived or deleted |
+| any other folder in `/workspace/sessions/` | belongs to no session | the sweep, 30 days after the newest file changed |
 | `<session folder>/.home/` | that session's HOME: GOPATH, `~/.local`, its kubeconfig | with its folder |
 | `/workspace/.cache/` | Go module and build caches, npm, uv, Composer and mise caches, shared | the sweep, whole, above 20 GiB |
 | `/opt/nvm/` | Node 24 and 26, and whatever `npm install -g` adds | the next pod restart |
@@ -62,13 +63,18 @@ Background sessions run under Claude Code's own supervisor process inside the po
   shutdown, not only on archive. A folder counts as clean unless it is itself a git repo, and ours hold clones one
   level down. So a WorktreeRemove hook would delete uncommitted work on every restart. The sweep cleans up
   instead.
-- **Staleness is the last transcript write.** A folder's own timestamp does not change when files deeper inside
-  do. Claude Code names the transcript folder after the working directory, every non-alphanumeric character
-  turned into `-`, so the sweep finds it from the path. The home session is long-lived, so its subfolders go by
-  their newest file instead.
-- **30 days.** Matches Claude Code's default transcript retention. The workspace volume is sized for it.
-- **The sweep runs detached, at most once an hour.** The WorktreeCreate hook must print its path and return, so
-  it starts the sweep in the background under a lock.
+- **A session folder goes when claude.ai reports its session archived or deleted.** An active session keeps its
+  folder at any age. A `bridge-<id>` folder carries the session ID in its name. A scheduled session's ID is in
+  Claude Code's job record, `~/.claude/jobs/*/state.json`. A folder with no ID goes 30 days after its newest
+  file changed, and so do the home session's subfolders.
+- **An undocumented endpoint.** `GET /v1/code/sessions/<id>` on api.anthropic.com is what Claude Code itself
+  reads. A Claude Code release can change it. Any answer but `archived`, `active` or a 404 keeps the folder.
+- **The sweep borrows the running server's access token.** It never refreshes the token, because a refresh token
+  works once. An expired token skips the session check for that day.
+- **A 404 counts only when another session answered.** A token from another account gets a 404 for every
+  session. That would otherwise delete every folder.
+- **A daily CronJob, not a hook.** A CronJob in the chart runs the sweep through `kubectl exec` at 04:30 UTC,
+  before the 05:00 Longhorn trim returns the freed blocks.
 - **No sudo, HOME per session.** Tools that install into HOME stay inside one session and vanish with its folder.
   Anything that needs root must go into the image.
 - **Shared download caches.** Go, npm and uv caches are content-addressed and safe for parallel use. Cost: a

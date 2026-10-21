@@ -66,7 +66,7 @@ kubectl -n claudetainer exec deploy/claudetainer -- ls /workspace/sessions /home
 ```
 
 Expected: each `bridge-<id>` folder has a transcript folder `-workspace-sessions-bridge-<id>`.
-If it fails: the sweep falls back to folder timestamps and may delete active sessions. Fix `sweep.sh`.
+If it fails: the runbook's way to find a session's folder from its transcript is wrong. Fix the runbook.
 
 ## 6. Mid-run login expiry
 

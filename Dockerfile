@@ -2,9 +2,9 @@
 
 # Global scope. Redeclare each ARG bare above the RUN that uses it, so a bump rebuilds from there down.
 # renovate: datasource=npm depName=@anthropic-ai/claude-code
-ARG CLAUDE_VERSION=2.1.306
+ARG CLAUDE_VERSION=2.1.308
 # renovate: datasource=git-refs depName=https://github.com/anthropics/claude-plugins-official branch=main
-ARG CLAUDE_PLUGINS_REF=d1adba47161a271799de7b548225d929310046bd
+ARG CLAUDE_PLUGINS_REF=af59ee3a1051a29dda4a2e7a2af221aa457ae08b
 # renovate: datasource=npm depName=@playwright/mcp
 ARG PLAYWRIGHT_MCP_VERSION=0.0.83
 # renovate: datasource=github-releases depName=kubernetes/kubernetes
@@ -38,9 +38,9 @@ ARG GOVULNCHECK_VERSION=v1.9.0
 # renovate: datasource=github-releases depName=nvm-sh/nvm
 ARG NVM_VERSION=v0.40.8
 # renovate: datasource=github-tags depName=nodejs/node
-ARG NODE24_VERSION=v24.22.0
+ARG NODE24_VERSION=v24.22.1
 # renovate: datasource=github-tags depName=nodejs/node
-ARG NODE26_VERSION=v26.12.0
+ARG NODE26_VERSION=v26.12.1
 # renovate: datasource=pypi depName=pgcli
 ARG PGCLI_VERSION=4.7.1
 ARG PG_MAJOR=18
@@ -49,13 +49,13 @@ ARG MISE_VERSION=v2026.10.17
 # renovate: datasource=git-refs depName=https://github.com/jdx/vfox-php branch=main
 ARG VFOX_PHP_REF=818b3ba08fb4718ece6e6382b36cdde85357cbb5
 # renovate: datasource=github-tags depName=php/php-src
-ARG PHP82_VERSION=8.2.34
+ARG PHP82_VERSION=8.2.35
 # renovate: datasource=github-tags depName=php/php-src
-ARG PHP83_VERSION=8.3.35
+ARG PHP83_VERSION=8.3.36
 # renovate: datasource=github-tags depName=php/php-src
-ARG PHP84_VERSION=8.4.26
+ARG PHP84_VERSION=8.4.27
 # renovate: datasource=github-tags depName=php/php-src
-ARG PHP85_VERSION=8.5.11
+ARG PHP85_VERSION=8.5.12
 # renovate: datasource=github-tags depName=xdebug/xdebug
 ARG XDEBUG_VERSION=3.5.3
 # renovate: datasource=github-tags depName=krakjoe/pcov
@@ -75,7 +75,7 @@ ARG HADOLINT_VERSION=v2.15.1
 # renovate: datasource=pypi depName=yamllint
 ARG YAMLLINT_VERSION=1.38.0
 # renovate: datasource=npm depName=renovate
-ARG RENOVATE_VERSION=44.173.1
+ARG RENOVATE_VERSION=44.176.2
 # renovate: datasource=npm depName=prettier
 ARG PRETTIER_VERSION=3.9.10
 # renovate: datasource=github-releases depName=go-delve/delve
@@ -86,7 +86,7 @@ ARG MCP_VICTORIAMETRICS_VERSION=v1.20.2
 ARG MCP_VICTORIALOGS_VERSION=v1.9.0
 
 # Cross-compiles on the build machine's architecture, so this stage needs no emulation.
-FROM --platform=$BUILDPLATFORM golang:1.27-alpine@sha256:f2c872bcee949b7be9c490efd02b48a8a2fbf947cdf533f1c58525ec9d8170fd AS exporter
+FROM --platform=$BUILDPLATFORM golang:1.27-alpine@sha256:d530cf60723abf1ffae0cd16bb546b379ec0550d2f3815e5b16ed69dbc00fba4 AS exporter
 ARG TARGETOS
 ARG TARGETARCH
 WORKDIR /src
@@ -95,7 +95,7 @@ RUN go mod download
 COPY cmd/ cmd/
 RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -trimpath -ldflags='-s -w' -o /login-exporter ./cmd/login-exporter
 
-FROM docker/sandbox-templates:claude-code-minimal-0.7.0@sha256:31176d2cbb07ba18a709f015bea0e6e3c56f6b7b92744d16309d94e905c91482 AS base
+FROM docker/sandbox-templates:claude-code-minimal-0.10.0@sha256:e82cbbef8a57af6574d4053b4c6f4ba4441ae22e478f94fa26def54f10958bba AS base
 
 ARG TARGETARCH
 # The build stages run as root. The final stage switches to agent at its end.

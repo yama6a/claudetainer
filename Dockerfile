@@ -2,9 +2,9 @@
 
 # Global scope. Redeclare each ARG bare above the RUN that uses it, so a bump rebuilds from there down.
 # renovate: datasource=npm depName=@anthropic-ai/claude-code
-ARG CLAUDE_VERSION=2.1.309
+ARG CLAUDE_VERSION=2.1.310
 # renovate: datasource=git-refs depName=https://github.com/anthropics/claude-plugins-official branch=main
-ARG CLAUDE_PLUGINS_REF=465f09344424225c25d438f2e052732c3d688d2f
+ARG CLAUDE_PLUGINS_REF=58267944f92187b7d6a1c822165c96c81c864806
 # renovate: datasource=npm depName=@playwright/mcp
 ARG PLAYWRIGHT_MCP_VERSION=0.0.83
 # renovate: datasource=github-releases depName=kubernetes/kubernetes
@@ -30,7 +30,7 @@ ARG GO_VERSION=go1.27.3
 # renovate: datasource=go depName=golang.org/x/tools/gopls
 ARG GOPLS_VERSION=v0.24.0
 # renovate: datasource=go depName=github.com/oapi-codegen/oapi-codegen/v2
-ARG OAPI_CODEGEN_VERSION=v2.8.0
+ARG OAPI_CODEGEN_VERSION=v2.8.1
 # renovate: datasource=go depName=mvdan.cc/gofumpt
 ARG GOFUMPT_VERSION=v0.12.0
 # renovate: datasource=go depName=golang.org/x/vuln
@@ -45,7 +45,7 @@ ARG NODE26_VERSION=v26.12.1
 ARG PGCLI_VERSION=4.7.1
 ARG PG_MAJOR=18
 # renovate: datasource=github-releases depName=jdx/mise
-ARG MISE_VERSION=v2026.10.17
+ARG MISE_VERSION=v2026.10.18
 # renovate: datasource=git-refs depName=https://github.com/jdx/vfox-php branch=main
 ARG VFOX_PHP_REF=818b3ba08fb4718ece6e6382b36cdde85357cbb5
 # renovate: datasource=github-tags depName=php/php-src
@@ -75,7 +75,7 @@ ARG HADOLINT_VERSION=v2.15.1
 # renovate: datasource=pypi depName=yamllint
 ARG YAMLLINT_VERSION=1.38.0
 # renovate: datasource=npm depName=renovate
-ARG RENOVATE_VERSION=44.178.5
+ARG RENOVATE_VERSION=44.181.1
 # renovate: datasource=npm depName=prettier
 ARG PRETTIER_VERSION=3.9.10
 # renovate: datasource=github-releases depName=go-delve/delve

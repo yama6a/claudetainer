@@ -19,6 +19,8 @@ ARG KUSTOMIZE_VERSION=v5.8.3
 ARG KUBECTX_VERSION=v0.11.0
 # renovate: datasource=github-releases depName=yannh/kubeconform
 ARG KUBECONFORM_VERSION=v0.8.0
+# renovate: datasource=github-releases depName=bitnami-labs/sealed-secrets
+ARG KUBESEAL_VERSION=v0.40.0
 # renovate: datasource=github-releases depName=mikefarah/yq
 ARG YQ_VERSION=v4.54.1
 # renovate: datasource=github-releases depName=siderolabs/talos
@@ -183,6 +185,7 @@ ARG K9S_VERSION
 ARG KUSTOMIZE_VERSION
 ARG KUBECTX_VERSION
 ARG KUBECONFORM_VERSION
+ARG KUBESEAL_VERSION
 ARG YQ_VERSION
 ARG TALOSCTL_VERSION
 ARG GOLANGCI_LINT_VERSION
@@ -209,9 +212,10 @@ RUN set -eux; \
     curl -fsSL "https://github.com/derailed/k9s/releases/download/${K9S_VERSION}/k9s_Linux_${TARGETARCH}.tar.gz" | tar -xz -C /tmp k9s; \
     curl -fsSL "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2F${KUSTOMIZE_VERSION}/kustomize_${KUSTOMIZE_VERSION}_linux_${TARGETARCH}.tar.gz" | tar -xz -C /tmp kustomize; \
     curl -fsSL "https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}/kubeconform-linux-${TARGETARCH}.tar.gz" | tar -xz -C /tmp kubeconform; \
+    curl -fsSL "https://github.com/bitnami-labs/sealed-secrets/releases/download/${KUBESEAL_VERSION}/kubeseal-${KUBESEAL_VERSION#v}-linux-${TARGETARCH}.tar.gz" | tar -xz -C /tmp kubeseal; \
     curl -fsSL "https://github.com/ahmetb/kubectx/releases/download/${KUBECTX_VERSION}/kubectx_${KUBECTX_VERSION}_linux_${alt_arch}.tar.gz" | tar -xz -C /tmp kubectx; \
     curl -fsSL "https://github.com/ahmetb/kubectx/releases/download/${KUBECTX_VERSION}/kubens_${KUBECTX_VERSION}_linux_${alt_arch}.tar.gz" | tar -xz -C /tmp kubens; \
-    install -m 0755 /tmp/k9s /tmp/kustomize /tmp/kubeconform /tmp/kubectx /tmp/kubens /usr/local/bin/; \
+    install -m 0755 /tmp/k9s /tmp/kustomize /tmp/kubeconform /tmp/kubeseal /tmp/kubectx /tmp/kubens /usr/local/bin/; \
     curl -fsSL "https://github.com/golangci/golangci-lint/releases/download/v${GOLANGCI_LINT_VERSION}/golangci-lint-${GOLANGCI_LINT_VERSION}-linux-${TARGETARCH}.tar.gz" \
       | tar -xz -C /tmp "golangci-lint-${GOLANGCI_LINT_VERSION}-linux-${TARGETARCH}/golangci-lint"; \
     install -m 0755 "/tmp/golangci-lint-${GOLANGCI_LINT_VERSION}-linux-${TARGETARCH}/golangci-lint" /usr/local/bin/golangci-lint; \

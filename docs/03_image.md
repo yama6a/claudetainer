@@ -25,7 +25,7 @@ Every version is an `ARG` at the top of the `Dockerfile`, with a `# renovate:` l
 | Group | Tools |
 |---|---|
 | Claude | Claude Code, root-owned in `/opt/claude`, updater off |
-| Kubernetes | kubectl, helm 4, kustomize, kubeconform, yq, kubectx, kubens, k9s |
+| Kubernetes | kubectl, helm 4, kustomize, kubeconform, kubeseal, yq, kubectx, kubens, k9s |
 | Talos | talosctl |
 | Go | Go, gopls, golangci-lint, gofumpt, govulncheck, oapi-codegen, delve |
 | Node | nvm with Node 24 and 26, 26 the default |

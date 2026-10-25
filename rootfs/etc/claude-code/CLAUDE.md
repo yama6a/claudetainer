@@ -23,7 +23,7 @@ No sudo, no apt. Put a missing tool in `~/.local/bin`, or add it to the image wi
 | Go | go, gopls, golangci-lint, gofumpt, govulncheck, oapi-codegen, dlv |
 | Node | nvm with Node 24 and 26, npm, npx |
 | PHP | mise with PHP 8.2, 8.3, 8.4 and 8.5, Composer, Xdebug, PCOV, Intelephense |
-| Kubernetes | kubectl, helm 4, kustomize, kubeconform, kubectx, kubens, k9s |
+| Kubernetes | kubectl, helm 4, kustomize, kubeconform, kubeseal, kubectx, kubens, k9s |
 | Talos | talosctl, read-only |
 | Lint | shellcheck, shfmt, actionlint, hadolint, yamllint, prettier, renovate, renovate-config-validator |
 | Databases | psql 18, pgcli, sqlite3 |

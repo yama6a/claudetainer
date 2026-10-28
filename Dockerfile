@@ -362,7 +362,7 @@ RUN HOME=/opt/claude sh -c "mkdir -p /opt/claude && curl -fsSL https://claude.ai
 
 COPY rootfs/ /
 COPY --from=exporter /login-exporter /usr/local/bin/login-exporter
-RUN chmod 0755 /usr/local/bin/claudetainer-start /usr/local/bin/uvx /usr/local/lib/claudetainer/*.sh \
+RUN chmod 0755 /usr/local/bin/claudetainer-start /usr/local/bin/claudetainer-login /usr/local/bin/uvx /usr/local/lib/claudetainer/*.sh \
     && mkdir -p /workspace \
     && chown agent:agent /workspace /home/agent
 

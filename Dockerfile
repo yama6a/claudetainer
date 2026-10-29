@@ -40,14 +40,14 @@ ARG GOVULNCHECK_VERSION=v1.9.0
 # renovate: datasource=github-releases depName=nvm-sh/nvm
 ARG NVM_VERSION=v0.40.8
 # renovate: datasource=github-tags depName=nodejs/node
-ARG NODE24_VERSION=v24.22.1
+ARG NODE24_VERSION=v24.22.2
 # renovate: datasource=github-tags depName=nodejs/node
-ARG NODE26_VERSION=v26.12.1
+ARG NODE26_VERSION=v26.13.0
 # renovate: datasource=pypi depName=pgcli
 ARG PGCLI_VERSION=4.7.1
 ARG PG_MAJOR=18
 # renovate: datasource=github-releases depName=jdx/mise
-ARG MISE_VERSION=v2026.10.21
+ARG MISE_VERSION=v2026.10.22
 # renovate: datasource=git-refs depName=https://github.com/jdx/vfox-php branch=main
 ARG VFOX_PHP_REF=818b3ba08fb4718ece6e6382b36cdde85357cbb5
 # renovate: datasource=github-tags depName=php/php-src
@@ -77,7 +77,7 @@ ARG HADOLINT_VERSION=v2.15.1
 # renovate: datasource=pypi depName=yamllint
 ARG YAMLLINT_VERSION=1.38.0
 # renovate: datasource=npm depName=renovate
-ARG RENOVATE_VERSION=44.190.1
+ARG RENOVATE_VERSION=44.192.2
 # renovate: datasource=npm depName=prettier
 ARG PRETTIER_VERSION=3.9.10
 # renovate: datasource=github-releases depName=go-delve/delve

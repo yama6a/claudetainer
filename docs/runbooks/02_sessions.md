@@ -46,6 +46,7 @@ kubectl -n claudetainer logs -f job/<name>-manual
 ```
 
 Expected: `backgrounded` and a short session ID. A session `<name> <time>` shows in claude.ai within a minute.
+For an entry with a gate, `gate: no session needed` is also a normal result. The gate found no work.
 
 ## Restart the server
 

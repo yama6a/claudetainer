@@ -2,7 +2,7 @@
 
 # Global scope. Redeclare each ARG bare above the RUN that uses it, so a bump rebuilds from there down.
 # renovate: datasource=npm depName=@anthropic-ai/claude-code
-ARG CLAUDE_VERSION=2.1.312
+ARG CLAUDE_VERSION=2.1.314
 # renovate: datasource=git-refs depName=https://github.com/anthropics/claude-plugins-official branch=main
 ARG CLAUDE_PLUGINS_REF=f8c5e7a1dcb71b10cb74586224b5401f3de5db28
 # renovate: datasource=npm depName=@playwright/mcp
@@ -47,7 +47,7 @@ ARG NODE26_VERSION=v26.13.0
 ARG PGCLI_VERSION=4.7.1
 ARG PG_MAJOR=18
 # renovate: datasource=github-releases depName=jdx/mise
-ARG MISE_VERSION=v2026.10.22
+ARG MISE_VERSION=v2026.10.23
 # renovate: datasource=git-refs depName=https://github.com/jdx/vfox-php branch=main
 ARG VFOX_PHP_REF=818b3ba08fb4718ece6e6382b36cdde85357cbb5
 # renovate: datasource=github-tags depName=php/php-src
@@ -63,7 +63,7 @@ ARG XDEBUG_VERSION=3.5.3
 # renovate: datasource=github-tags depName=krakjoe/pcov
 ARG PCOV_VERSION=v1.0.12
 # renovate: datasource=github-releases depName=composer/composer
-ARG COMPOSER_VERSION=2.10.3
+ARG COMPOSER_VERSION=2.11.0
 # renovate: datasource=npm depName=intelephense
 ARG INTELEPHENSE_VERSION=1.18.5
 # renovate: datasource=github-releases depName=koalaman/shellcheck
@@ -77,7 +77,7 @@ ARG HADOLINT_VERSION=v2.15.1
 # renovate: datasource=pypi depName=yamllint
 ARG YAMLLINT_VERSION=1.38.0
 # renovate: datasource=npm depName=renovate
-ARG RENOVATE_VERSION=44.192.2
+ARG RENOVATE_VERSION=44.198.0
 # renovate: datasource=npm depName=prettier
 ARG PRETTIER_VERSION=3.9.10
 # renovate: datasource=github-releases depName=go-delve/delve

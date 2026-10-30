@@ -14,8 +14,9 @@ die() {
 # The image sets these empty to hide the base image's values. Claude needs them absent.
 unset BASH_ENV CLAUDE_ENV_FILE NPM_CONFIG_PREFIX
 
-[ -d "$OUT" ] && [ -w "$OUT" ] \
-  || die "mount a folder that uid 1000 can write at $OUT, for example -v \"\$PWD/login:$OUT\""
+if [ ! -d "$OUT" ] || [ ! -w "$OUT" ]; then
+  die "mount a folder that uid 1000 can write at $OUT, for example -v \"\$PWD/login:$OUT\""
+fi
 
 CLAUDE_CONFIG_DIR="$(mktemp -d)"
 export CLAUDE_CONFIG_DIR

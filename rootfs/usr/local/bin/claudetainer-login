@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# Logs in to claude.ai with a throwaway config folder and writes the refresh token and scopes out for sealing.
+set -euo pipefail
+
+# ---- knobs ----
+OUT=/out                                 # the host folder that receives refresh-token and scopes
+REQUIRED_SCOPE=user:sessions:claude_code # Remote Control refuses a login without it
+
+die() {
+  printf 'claudetainer-login: %s\n' "$*" >&2
+  exit 1
+}
+
+# The image sets these empty to hide the base image's values. Claude needs them absent.
+unset BASH_ENV CLAUDE_ENV_FILE NPM_CONFIG_PREFIX
+
+if [ ! -d "$OUT" ] || [ ! -w "$OUT" ]; then
+  die "mount a folder that uid 1000 can write at $OUT, for example -v \"\$PWD/login:$OUT\""
+fi
+
+CLAUDE_CONFIG_DIR="$(mktemp -d)"
+export CLAUDE_CONFIG_DIR
+trap 'rm -rf "$CLAUDE_CONFIG_DIR"' EXIT
+creds="$CLAUDE_CONFIG_DIR/.credentials.json"
+
+claude auth login --claudeai
+[ -s "$creds" ] || die "claude auth login wrote no $creds"
+jq -e --arg s "$REQUIRED_SCOPE" '.claudeAiOauth.scopes | index($s)' "$creds" > /dev/null \
+  || die "the login lacks the scope $REQUIRED_SCOPE"
+
+umask 077
+jq -r '.claudeAiOauth.refreshToken' "$creds" > "$OUT/refresh-token"
+jq -r '.claudeAiOauth.scopes | join(" ")' "$creds" > "$OUT/scopes"
+printf 'wrote refresh-token and scopes. The refresh token expires %s.\n' \
+  "$(jq -r '.claudeAiOauth.refreshTokenExpiresAt / 1000 | todate' "$creds")"

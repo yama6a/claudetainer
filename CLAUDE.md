@@ -46,7 +46,7 @@ make smoke       # after any Dockerfile, rootfs or Go change
 | Value | Lives in |
 |---|---|
 | Tool versions, the base image digest, the plugin marketplace commit | `Dockerfile` `ARG`s and `FROM` |
-| Session rules: sweep age, cache limit | knobs in `rootfs/usr/local/lib/claudetainer/sweep.sh` |
+| Session rules: sweep age, cache limits | knobs in `rootfs/usr/local/lib/claudetainer/sweep.sh` |
 | The default PHP version, PHP's `memory_limit` | `rootfs/etc/mise/config.toml`, `rootfs/etc/php/claudetainer/` |
 | claudetainer's hooks, transcript retention | `rootfs/etc/claude-code/managed-settings.json` |
 | Skills for every session, generic only | `rootfs/etc/claude-code/.claude/skills/` |

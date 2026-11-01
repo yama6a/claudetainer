@@ -44,9 +44,16 @@ claude.ai like any other session.
 3. The CronJob passes a name and pipes the prompt to `scheduled-session.sh`, which creates
    `/workspace/sessions/scheduled-<name>-<time>/`.
 4. It starts `claude --bg --remote-control` there. The session shows in claude.ai as `<name> <time>`.
+5. `bg-sessions.sh pin` pins the new session.
 
 Background sessions run under Claude Code's own supervisor process inside the pod, apart from the
-`claude remote-control` server.
+`claude remote-control` server. A pinned session stays connected until you archive it, like a claude.ai session:
+
+| Event | What keeps it connected |
+|---|---|
+| 8 hours idle | the pin. The supervisor stops only unpinned idle sessions |
+| pod restart | `claudetainer-start` runs `bg-sessions.sh resume`. It resumes each scheduled session the stop killed, unless claude.ai reports it archived or deleted |
+| you archive it | the hourly `bg-unpin` CronJob runs `bg-sessions.sh unpin-archived`. The supervisor then stops it after 8 hours idle |
 
 ## Decisions
 
@@ -60,8 +67,16 @@ Background sessions run under Claude Code's own supervisor process inside the po
 - **A gate script decides if a scheduled session starts.** A check that rarely finds work can run every hour.
   The gate costs a few queries, and Claude runs only when there is work. The gate runs in the pod, so it has
   the pod's gh login and network access.
-- **A pod restart stops a running scheduled session.** The supervisor dies with the pod. The server brings back
-  only its own sessions. The next run starts a new session.
+- **Pin and resume, not a session from the server.** The supervisor dies with the pod, and the server brings back
+  only its own sessions. So the start script resumes the scheduled ones. A resume continues the same session.
+  A turn that was running is lost, as with the server's sessions.
+- **A pin per scheduled session.** No setting changes the 8-hour idle stop in Claude Code 2.1.316. A pin is the
+  only exemption. `bg-sessions.sh` edits `~/.claude/jobs/pins.json` under the lock the supervisor uses. Cost: each
+  unarchived scheduled session holds about 300 MiB of the pod's memory. Under low memory the supervisor stops
+  pinned idle sessions too.
+- **Resume only what claude.ai reports active.** The resume reads the same endpoint and borrowed token as the
+  sweep. An expired token or any answer but `active` skips the session. It then stays disconnected until you
+  resume it by hand, see [runbooks/02_sessions.md](runbooks/02_sessions.md).
 
 - **A folder per session, from `--spawn worktree` and a WorktreeCreate hook.** Git worktrees of one repo do not
   fit sessions that clone several repos. The hook-created folder is empty, and Claude clones into it.

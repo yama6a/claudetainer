@@ -6,7 +6,7 @@ ARG CLAUDE_VERSION=2.1.316
 # renovate: datasource=git-refs depName=https://github.com/anthropics/claude-plugins-official branch=main
 ARG CLAUDE_PLUGINS_REF=a7ba5b93db0c7c8d17f3f1d25853adca79598a1a
 # renovate: datasource=npm depName=@playwright/mcp
-ARG PLAYWRIGHT_MCP_VERSION=0.0.83
+ARG PLAYWRIGHT_MCP_VERSION=0.0.84
 # renovate: datasource=github-releases depName=kubernetes/kubernetes
 ARG KUBECTL_VERSION=v1.37.2
 # renovate: datasource=github-releases depName=helm/helm
@@ -32,7 +32,7 @@ ARG GO_VERSION=go1.27.3
 # renovate: datasource=go depName=golang.org/x/tools/gopls
 ARG GOPLS_VERSION=v0.24.0
 # renovate: datasource=go depName=github.com/oapi-codegen/oapi-codegen/v2
-ARG OAPI_CODEGEN_VERSION=v2.8.1
+ARG OAPI_CODEGEN_VERSION=v2.8.2
 # renovate: datasource=go depName=mvdan.cc/gofumpt
 ARG GOFUMPT_VERSION=v0.12.0
 # renovate: datasource=go depName=golang.org/x/vuln
@@ -47,7 +47,7 @@ ARG NODE26_VERSION=v26.13.0
 ARG PGCLI_VERSION=4.7.1
 ARG PG_MAJOR=18
 # renovate: datasource=github-releases depName=jdx/mise
-ARG MISE_VERSION=v2026.10.24
+ARG MISE_VERSION=v2026.10.25
 # renovate: datasource=git-refs depName=https://github.com/jdx/vfox-php branch=main
 ARG VFOX_PHP_REF=818b3ba08fb4718ece6e6382b36cdde85357cbb5
 # renovate: datasource=github-tags depName=php/php-src

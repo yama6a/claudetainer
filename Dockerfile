@@ -45,6 +45,7 @@ ARG NODE24_VERSION=v24.22.2
 ARG NODE26_VERSION=v26.13.0
 # renovate: datasource=pypi depName=pgcli
 ARG PGCLI_VERSION=4.7.1
+# renovate: datasource=docker depName=postgres
 ARG PG_MAJOR=18
 # renovate: datasource=github-releases depName=jdx/mise
 ARG MISE_VERSION=v2026.10.25

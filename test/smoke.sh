@@ -85,6 +85,7 @@ probes="$(
     p context7-headers "/usr/local/lib/claudetainer/context7-headers.sh"
     p scheduled-session "/usr/local/lib/claudetainer/scheduled-session.sh Bad < /dev/null 2>&1 || true"
     p claudetainer-login "claudetainer-login 2>&1 || true"
+    p bg-sessions "/usr/local/lib/claudetainer/bg-sessions.sh 2>&1 || true"
     p login-exporter "(login-exporter > /dev/null 2>&1 &) && sleep 1 && curl -fsS localhost:9100/metrics | grep ^claudetainer_login_present"
     p uid "id -u"
     p bash-env "echo \"[${BASH_ENV}]\""
@@ -174,6 +175,7 @@ expect context7-plugin /usr/local/lib/claudetainer/context7-headers.sh
 expect context7-headers "{}"
 expect scheduled-session "usage: scheduled-session.sh"
 expect claudetainer-login "mount a folder that uid 1000 can write at /out"
+expect bg-sessions "usage: bg-sessions.sh"
 expect login-exporter "claudetainer_login_present 0"
 expect uid 1000
 expect bash-env "[]"

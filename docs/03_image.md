@@ -55,6 +55,18 @@ there.
   servers and read the server URLs from the pod environment. The start script installs each one only when the pod
   sets its URL: `VM_INSTANCE_ENTRYPOINT`, or `VL_INSTANCE_ENTRYPOINT`. `VM_INSTANCE_TYPE` defaults to `single`.
 
+## Skills
+
+Skills for every session live in `rootfs/etc/claude-code/.claude/skills/`. Claude Code loads skills from
+`.claude/skills/` in the managed settings directory, which is `/etc/claude-code`.
+
+- **Why the managed directory, not a plugin.** A skill there runs as `/skill-name` in every session with no
+  install step. A plugin would add a marketplace entry and a namespaced name for the same result.
+- **Cost:** a managed skill wins over a personal or project skill of the same name, so a user cannot override it,
+  only add one with another name.
+- **Only generic skills belong here.** The repo is public. A skill that names one person's projects goes into
+  that person's Claude config in their deployment, `files/claude/skills/` of the chart.
+
 ## Decisions
 
 - **Docker's image over a community one or our own from scratch.** Anthropic publishes no ready-made image. The

@@ -38,9 +38,12 @@ locations are set in the container environment, not per session.
 A scheduled session is a session that starts on a cron schedule with a fixed prompt. You read and answer it in
 claude.ai like any other session.
 
-1. A CronJob in the chart runs `kubectl exec` into the claudetainer pod. It passes a name and pipes the prompt.
-2. `scheduled-session.sh` creates `/workspace/sessions/scheduled-<name>-<time>/`.
-3. It starts `claude --bg --remote-control` there. The session shows in claude.ai as `<name> <time>`.
+1. A CronJob in the chart runs `kubectl exec` into the claudetainer pod.
+2. When the entry has a gate script, the CronJob runs it in the pod first. Empty output ends the run with no
+   session. Other output is appended to the prompt.
+3. The CronJob passes a name and pipes the prompt to `scheduled-session.sh`, which creates
+   `/workspace/sessions/scheduled-<name>-<time>/`.
+4. It starts `claude --bg --remote-control` there. The session shows in claude.ai as `<name> <time>`.
 
 Background sessions run under Claude Code's own supervisor process inside the pod, apart from the
 `claude remote-control` server.
@@ -54,6 +57,9 @@ Background sessions run under Claude Code's own supervisor process inside the po
   [06_access.md](06_access.md).
 - **Schedule and prompt in the chart, the start script in the image.** The prompt is personal. The way to start
   a session is the same for every user.
+- **A gate script decides if a scheduled session starts.** A check that rarely finds work can run every hour.
+  The gate costs a few queries, and Claude runs only when there is work. The gate runs in the pod, so it has
+  the pod's gh login and network access.
 - **A pod restart stops a running scheduled session.** The supervisor dies with the pod. The server brings back
   only its own sessions. The next run starts a new session.
 
@@ -79,6 +85,9 @@ Background sessions run under Claude Code's own supervisor process inside the po
   Anything that needs root must go into the image.
 - **Shared download caches.** Go, npm and uv caches are content-addressed and safe for parallel use. Cost: a
   session can poison an entry the others then read. The sweep wipes the cache whole above 20 GiB.
+- **Hourly Go build cache prune.** Go's own trim keeps entries for 5 days. A busy day of Go work adds over 30 GiB
+  in 12 hours, faster than the daily sweep catches. So `sweep.sh cache` runs every hour. It deletes Go build
+  entries unused for 6 hours, then applies the 20 GiB limit. Cost: a session idle for 6 hours rebuilds from scratch.
 - **nvm writable and shared.** nvm refuses to switch Node while an npm prefix outside its folder is set, so there
   is no per-session npm prefix. `npm install -g` and `nvm install` write into `/opt/nvm`, shared by every session
   and lost on restart.

@@ -14,6 +14,8 @@ jobs:
   build-push:
     # One native runner per architecture: the apt and Playwright installs are slow and fragile under QEMU.
     uses: yama6a/gha/.github/workflows/docker-build-release-multiarch.yaml@v2
+    with:
+      registry-cache: true # skips the 23-minute PHP compiles while PHP and the base stage are unchanged
     permissions:
       contents: write # required to create the GitHub release
       packages: write # required, or the image push fails with permission_denied

@@ -19,6 +19,7 @@ in `chart-draft/`, which git ignores. Procedures are in [runbooks/05_deployment.
 | CronJob `claudetainer-scheduled-<name>` | claudetainer | one per entry in `scheduledSessions`, see [02_sessions.md](02_sessions.md) |
 | ServiceAccount, Role and RoleBinding `claudetainer-scheduled-session` | claudetainer | exec into the claudetainer pod only |
 | CronJob `claudetainer-sweep` | claudetainer | daily at 04:30 UTC, see [02_sessions.md](02_sessions.md) |
+| CronJob `claudetainer-sweep-cache` | claudetainer | hourly, the cache part of the sweep only |
 | ServiceAccount, Role and RoleBinding `claudetainer-sweep` | claudetainer | exec into the claudetainer pod only |
 | Grafana alert file `claudetainer.yaml` | `argo_apps/platform/charts/05_grafana/files/alerts/` | the login expiry rule, see [04_login.md](04_login.md) |
 | 5 CiliumNetworkPolicies | both | see [06_access.md](06_access.md) |

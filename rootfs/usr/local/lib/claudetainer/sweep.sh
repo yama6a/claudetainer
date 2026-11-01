@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
-# Frees /workspace: folders of archived or deleted sessions, stale folders that belong to no session, and an
-# oversized cache. The chart's sweep CronJob calls it through kubectl exec once a day.
+# Frees /workspace: folders of archived or deleted sessions, stale folders that belong to no session, and the
+# cache. The chart's sweep CronJob calls it through kubectl exec once a day. The sweep-cache CronJob calls
+# `sweep.sh cache` every hour, which does only the cache part.
 set -euo pipefail
 shopt -s nullglob
 
 # ---- knobs ----
 STALE_DAYS=30                 # days without a file change before a folder that belongs to no session goes
 CACHE_LIMIT_GIB=20            # /workspace/.cache is wiped whole above this
+GO_BUILD_IDLE_HOURS=6         # Go build cache entries unused for this long are deleted
 API=https://api.anthropic.com # where claude.ai answers for a session's state
 
 SESSIONS=/workspace/sessions
@@ -26,6 +28,24 @@ remove() {
   chmod -R u+w "$1" 2> /dev/null || true
   rm -rf "$1"
 }
+
+# Go sets an entry's mtime when it uses the entry, at most once an hour.
+prune_cache() {
+  if [ -d "$CACHE/go-build" ]; then
+    find "$CACHE/go-build" -ignore_readdir_race -mindepth 2 -type f -mmin +$((GO_BUILD_IDLE_HOURS * 60)) -delete
+  fi
+  if [ -d "$CACHE" ] && [ "$(du -sk "$CACHE" | cut -f1)" -gt $((CACHE_LIMIT_GIB * 1024 * 1024)) ]; then
+    local entry
+    for entry in "$CACHE"/*; do remove "$entry"; done
+    log "cache above $CACHE_LIMIT_GIB GiB, wiped"
+  fi
+}
+
+if [ "${1:-}" = cache ]; then
+  shopt -s dotglob
+  prune_cache
+  exit 0
+fi
 
 remove_if_stale() {
   if [ -z "$(find "$1" -mtime -"$STALE_DAYS" -print -quit)" ]; then
@@ -98,7 +118,4 @@ done
 shopt -s dotglob
 for sub in "$SESSIONS"/home/*; do remove_if_stale "$sub"; done
 
-if [ -d "$CACHE" ] && [ "$(du -sk "$CACHE" | cut -f1)" -gt $((CACHE_LIMIT_GIB * 1024 * 1024)) ]; then
-  for entry in "$CACHE"/*; do remove "$entry"; done
-  log "cache above $CACHE_LIMIT_GIB GiB, wiped"
-fi
+prune_cache

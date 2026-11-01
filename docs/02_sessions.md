@@ -85,6 +85,9 @@ Background sessions run under Claude Code's own supervisor process inside the po
   Anything that needs root must go into the image.
 - **Shared download caches.** Go, npm and uv caches are content-addressed and safe for parallel use. Cost: a
   session can poison an entry the others then read. The sweep wipes the cache whole above 20 GiB.
+- **Hourly Go build cache prune.** Go's own trim keeps entries for 5 days. A busy day of Go work adds over 30 GiB
+  in 12 hours, faster than the daily sweep catches. So `sweep.sh cache` runs every hour. It deletes Go build
+  entries unused for 6 hours, then applies the 20 GiB limit. Cost: a session idle for 6 hours rebuilds from scratch.
 - **nvm writable and shared.** nvm refuses to switch Node while an npm prefix outside its folder is set, so there
   is no per-session npm prefix. `npm install -g` and `nvm install` write into `/opt/nvm`, shared by every session
   and lost on restart.

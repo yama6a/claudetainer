@@ -1,1 +1,2 @@
 disable=SC2016   # jq filters and sh -c bodies are single-quoted on purpose
+external-sources=true # lets the source= directives follow session-api.sh

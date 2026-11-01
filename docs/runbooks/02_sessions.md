@@ -45,7 +45,8 @@ kubectl -n claudetainer create job --from=cronjob/claudetainer-scheduled-<name> 
 kubectl -n claudetainer logs -f job/<name>-manual
 ```
 
-Expected: `backgrounded` and a short session ID. A session `<name> <time>` shows in claude.ai within a minute.
+Expected: `backgrounded`, a short session ID and `bg-sessions: <id>: pinned`. A session `<name> <time>` shows in
+claude.ai within a minute.
 For an entry with a gate, `gate: no session needed` is also a normal result. The gate found no work.
 
 ## Restart the server
@@ -60,3 +61,19 @@ Expected: sessions pause and answer again within a few minutes. A turn that was 
 
 The server brings sessions back for about 4 hours after it stopped. After that, start a new session. Its folder
 and transcript stay on disk until the sweep. Point the new session at the old folder to continue the work.
+
+## Resume a scheduled session by hand
+
+Use this when a scheduled session stays disconnected after a pod restart. Find its short ID and session ID:
+
+```bash
+kubectl -n claudetainer exec deploy/claudetainer -- sh -c 'jq -r "[.daemonShort, .sessionId, .state, .cwd] | @tsv" /home/agent/.claude/jobs/*/state.json'
+```
+
+Resume it in its folder, with no other flags. Extra flags start a copy instead:
+
+```bash
+kubectl -n claudetainer exec deploy/claudetainer -- sh -c 'unset BASH_ENV CLAUDE_ENV_FILE NPM_CONFIG_PREFIX; cd <cwd> && claude --bg --resume <session ID>'
+```
+
+Expected: `backgrounded` and the same short ID. The session answers in claude.ai within a minute. It keeps its pin.

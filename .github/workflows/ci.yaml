@@ -52,6 +52,7 @@ jobs:
           push: false
           load: true
           tags: claudetainer:ci
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache-linux-amd64 # read-only, the release in build-push.yaml writes it
       - run: ./test/smoke.sh claudetainer:ci
 
   build-arm64:
@@ -67,4 +68,5 @@ jobs:
           push: false
           load: true
           tags: claudetainer:ci
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache-linux-arm64 # read-only, the release in build-push.yaml writes it
       - run: ./test/smoke.sh claudetainer:ci

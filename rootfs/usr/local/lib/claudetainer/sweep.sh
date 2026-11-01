@@ -6,16 +6,17 @@ set -euo pipefail
 shopt -s nullglob
 
 # ---- knobs ----
-STALE_DAYS=30                 # days without a file change before a folder that belongs to no session goes
-CACHE_LIMIT_GIB=20            # /workspace/.cache is wiped whole above this
-GO_BUILD_IDLE_HOURS=6         # Go build cache entries unused for this long are deleted
-API=https://api.anthropic.com # where claude.ai answers for a session's state
+STALE_DAYS=30         # days without a file change before a folder that belongs to no session goes
+CACHE_LIMIT_GIB=20    # /workspace/.cache is wiped whole above this
+GO_BUILD_IDLE_HOURS=6 # Go build cache entries unused for this long are deleted
 
 SESSIONS=/workspace/sessions
 CACHE=/workspace/.cache
-CONFIG="${CLAUDE_CONFIG_DIR:-/home/agent/.claude}"
 
 log() { printf 'sweep: %s\n' "$*" >&2; }
+
+# shellcheck source=rootfs/usr/local/lib/claudetainer/session-api.sh
+source "$(dirname "$0")/session-api.sh"
 
 exec 9> /workspace/.sweep.lock
 if ! flock -n 9; then
@@ -54,28 +55,7 @@ remove_if_stale() {
   fi
 }
 
-# The running claude process refreshes this token. A refresh here would spend the refresh token, which works once.
-token=""
-creds="$CONFIG/.credentials.json"
-if [ -r "$creds" ] && [ "$(jq -r '.claudeAiOauth.expiresAt // 0' "$creds")" -gt $((($(date +%s) + 300) * 1000)) ]; then
-  token="$(jq -r '.claudeAiOauth.accessToken' "$creds")"
-else
-  log "no valid access token, keeping every session folder"
-fi
-
-# Undocumented: the endpoint Claude Code itself reads. Prints the session's status, or "deleted" on a 404.
-session_status() {
-  local body code
-  body="$(mktemp)"
-  code="$(curl -sS -m 15 -o "$body" -w '%{http_code}' -H "Authorization: Bearer $token" \
-    -H 'anthropic-version: 2023-06-01' "$API/v1/code/sessions/$1")" || code=000
-  case "$code" in
-    200) jq -r '.response_shape.status // empty' "$body" 2> /dev/null || echo "unreadable answer" ;;
-    404) echo deleted ;;
-    *) echo "HTTP $code" ;;
-  esac
-  rm -f "$body"
-}
+load_token || log "no valid access token, keeping every session folder"
 
 # A scheduled session's folder name holds no session ID. Claude Code's job record links the folder to it.
 declare -A ids

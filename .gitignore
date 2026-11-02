@@ -7,3 +7,5 @@
 /cover.out
 # Holds copies of personal Claude config for the GitOps repo, so it must never reach this public repo.
 chart-draft/
+# Holds a plain claude.ai refresh token and the unsealed Secret built from it.
+/login/

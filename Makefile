@@ -64,9 +64,12 @@ image:
 ci: tidy-check generate-check fmt-check lint vet test vuln
 
 # ---- claudetainer ----
-SHELL_FILES := rootfs/usr/local/bin/claudetainer-start rootfs/usr/local/bin/uvx $(wildcard rootfs/usr/local/lib/claudetainer/*.sh) $(wildcard build/*.sh) test/smoke.sh
+SHELL_FILES := rootfs/usr/local/bin/claudetainer-start rootfs/usr/local/bin/claudetainer-login rootfs/usr/local/bin/uvx $(wildcard rootfs/usr/local/lib/claudetainer/*.sh) $(wildcard build/*.sh) test/smoke.sh
 
-.PHONY: lint-image smoke
+.PHONY: lint-image smoke login secret sealed-secret
+
+LOGIN_IMAGE     := ghcr.io/yama6a/claudetainer:latest
+LOGIN_NAMESPACE ?= claudetainer
 
 # The same checks as CI's shell, yaml and hadolint steps. Needs shellcheck, shfmt, hadolint, yamllint, actionlint.
 lint-image:
@@ -78,3 +81,16 @@ lint-image:
 
 smoke: image
 	./test/smoke.sh $(IMAGE)
+
+# Writes the plain refresh token to ./login for the seal step in docs/runbooks/04_login.md.
+login:
+	mkdir -m 0700 -p login
+	docker run --rm -it --pull always -v "$(CURDIR)/login:/out" $(LOGIN_IMAGE) claudetainer-login
+
+secret:
+	kubectl create secret generic claudetainer-claude-login -n $(LOGIN_NAMESPACE) --dry-run=client -o yaml \
+		--from-file=refresh-token=login/refresh-token --from-file=scopes=login/scopes > login/secret-claude-login.yaml
+
+sealed-secret: secret
+	kubeseal --controller-namespace sealed-secrets --controller-name sealed-secrets --format yaml \
+		< login/secret-claude-login.yaml > login/sealedsecret-claude-login.yaml

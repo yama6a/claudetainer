@@ -68,7 +68,9 @@ Background sessions run under Claude Code's own supervisor process inside the po
   The gate costs a few queries, and Claude runs only when there is work. The gate runs in the pod, so it has
   the pod's gh login and network access.
 - **Pin and resume, not a session from the server.** The supervisor dies with the pod, and the server brings back
-  only its own sessions. So the start script resumes the scheduled ones. A resume continues the same session.
+  only its own sessions. So the start script runs `claude respawn` for the scheduled ones. That continues the
+  same session under the same claude.ai entry. `claude --bg --resume` would start a copy with no claude.ai
+  connection, because the old pod's session records still look live.
   A turn that was running is lost, as with the server's sessions.
 - **A pin per scheduled session.** No setting changes the 8-hour idle stop in Claude Code 2.1.316. A pin is the
   only exemption. `bg-sessions.sh` edits `~/.claude/jobs/pins.json` under the lock the supervisor uses. Cost: each

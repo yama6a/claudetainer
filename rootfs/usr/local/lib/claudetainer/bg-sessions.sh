@@ -58,8 +58,9 @@ pin() {
 }
 
 # No daemon runs yet at pod start, so a killed session's record still shows the state it had when the pod stopped.
+# `claude --bg --resume` would start a copy, because the old pod's session records still look live.
 resume() {
-  local state short id bridge cwd status
+  local state short bridge cwd status out
   local -a found=()
   if ! load_token; then
     log "no valid access token, resuming no session"
@@ -68,23 +69,23 @@ resume() {
   for state in "$JOBS"/*/state.json; do
     found+=("$(jq -r 'select(.state != "done" and .state != "stopped" and .bridgeSessionId
       and (.cwd | startswith("/workspace/sessions/scheduled-")))
-      | "\(.daemonShort) \(.sessionId) \(.bridgeSessionId) \(.cwd)"' "$state" 2> /dev/null || true)")
+      | "\(.daemonShort) \(.bridgeSessionId) \(.cwd)"' "$state" 2> /dev/null || true)")
   done
   for line in "${found[@]}"; do
     [ -n "$line" ] || continue
-    read -r short id bridge cwd <<< "$line"
+    read -r short bridge cwd <<< "$line"
     [ -d "$cwd" ] || continue
     status="$(session_status "$bridge")"
     if [ "$status" != active ]; then
       log "$short: $status, not resumed"
       continue
     fi
-    if ! (cd "$cwd" && claude --bg --resume "$id" > /dev/null); then
-      log "$short: resume failed"
+    if ! out="$(cd "$cwd" && claude respawn "$short" < /dev/null)"; then
+      log "$short: respawn failed"
       continue
     fi
-    edit_pins "$ADD" "$short" || true
-    log "$short: resumed"
+    edit_pins "$ADD" "${out##* }" || true
+    log "$short: resumed as ${out##* }"
   done
 }
 

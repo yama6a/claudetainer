@@ -64,16 +64,16 @@ and transcript stay on disk until the sweep. Point the new session at the old fo
 
 ## Resume a scheduled session by hand
 
-Use this when a scheduled session stays disconnected after a pod restart. Find its short ID and session ID:
+Use this when a scheduled session stays disconnected after a pod restart. Find its short ID and folder:
 
 ```bash
-kubectl -n claudetainer exec deploy/claudetainer -- sh -c 'jq -r "[.daemonShort, .sessionId, .state, .cwd] | @tsv" /home/agent/.claude/jobs/*/state.json'
+kubectl -n claudetainer exec deploy/claudetainer -- sh -c 'jq -r "[.daemonShort, .state, .cwd] | @tsv" /home/agent/.claude/jobs/*/state.json'
 ```
 
-Resume it in its folder, with no other flags. Extra flags start a copy instead:
+Respawn it in its folder. `claude --bg --resume` would start a copy with no claude.ai connection:
 
 ```bash
-kubectl -n claudetainer exec deploy/claudetainer -- sh -c 'unset BASH_ENV CLAUDE_ENV_FILE NPM_CONFIG_PREFIX; cd <cwd> && claude --bg --resume <session ID>'
+kubectl -n claudetainer exec deploy/claudetainer -- sh -c 'unset BASH_ENV CLAUDE_ENV_FILE NPM_CONFIG_PREFIX; cd <cwd> && claude respawn <short ID> < /dev/null'
 ```
 
-Expected: `backgrounded` and the same short ID. The session answers in claude.ai within a minute. It keeps its pin.
+Expected: `respawned <short ID>`. The session answers in claude.ai within a minute. It keeps its pin.

@@ -37,7 +37,8 @@ prune_cache() {
   fi
   if [ -d "$CACHE" ] && [ "$(du -sk "$CACHE" | cut -f1)" -gt $((CACHE_LIMIT_GIB * 1024 * 1024)) ]; then
     local entry
-    for entry in "$CACHE"/*; do remove "$entry"; done
+    # A running build can write into a folder while rm empties it. The next hourly run gets what stays.
+    for entry in "$CACHE"/*; do remove "$entry" || log "$entry changed during the wipe, left for the next run"; done
     log "cache above $CACHE_LIMIT_GIB GiB, wiped"
   fi
 }

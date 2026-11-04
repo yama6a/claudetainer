@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Keeps scheduled sessions connected the way the server keeps claude.ai sessions connected.
 #   pin <folder>     scheduled-session.sh pins the session it started there. The daemon never stops a pinned idle session
-#   resume           claudetainer-start resumes each scheduled session that the last pod stop killed
+#   resume           claudetainer-start resumes each background session that claude.ai has not archived or deleted
 #   unpin-archived   the chart's bg-unpin CronJob unpins sessions archived or deleted in claude.ai
 set -euo pipefail
 shopt -s nullglob
@@ -57,7 +57,7 @@ pin() {
   log "$short: pinned"
 }
 
-# No daemon runs yet at pod start, so a killed session's record still shows the state it had when the pod stopped.
+# A job's state is no filter: `done` only means the last turn ended, and an idle session stays connected.
 # `claude --bg --resume` would start a copy, because the old pod's session records still look live.
 resume() {
   local state short bridge cwd status out
@@ -67,19 +67,19 @@ resume() {
     return 0
   fi
   for state in "$JOBS"/*/state.json; do
-    found+=("$(jq -r 'select(.state != "done" and .state != "stopped" and .bridgeSessionId
-      and (.cwd | startswith("/workspace/sessions/scheduled-")))
-      | "\(.daemonShort) \(.bridgeSessionId) \(.cwd)"' "$state" 2> /dev/null || true)")
+    found+=("$(jq -r 'select(.bridgeSessionId) | "\(.daemonShort) \(.bridgeSessionId) \(.cwd)"' "$state" 2> /dev/null || true)")
   done
   for line in "${found[@]}"; do
     [ -n "$line" ] || continue
     read -r short bridge cwd <<< "$line"
     [ -d "$cwd" ] || continue
     status="$(session_status "$bridge")"
-    if [ "$status" != active ]; then
-      log "$short: $status, not resumed"
-      continue
-    fi
+    case "$status" in
+      archived | deleted)
+        log "$short: $status, not resumed"
+        continue
+        ;;
+    esac
     if ! out="$(cd "$cwd" && claude respawn "$short" < /dev/null)"; then
       log "$short: respawn failed"
       continue

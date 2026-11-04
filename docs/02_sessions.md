@@ -52,7 +52,7 @@ Background sessions run under Claude Code's own supervisor process inside the po
 | Event | What keeps it connected |
 |---|---|
 | 8 hours idle | the pin. The supervisor stops only unpinned idle sessions |
-| pod restart | `claudetainer-start` runs `bg-sessions.sh resume`. It resumes each scheduled session the stop killed, unless claude.ai reports it archived or deleted |
+| pod restart | `claudetainer-start` runs `bg-sessions.sh resume`. It resumes each background session, in any job state, unless claude.ai reports it archived or deleted |
 | you archive it | the hourly `bg-unpin` CronJob runs `bg-sessions.sh unpin-archived`. The supervisor then stops it after 8 hours idle |
 
 ## Decisions
@@ -76,9 +76,11 @@ Background sessions run under Claude Code's own supervisor process inside the po
   only exemption. `bg-sessions.sh` edits `~/.claude/jobs/pins.json` under the lock the supervisor uses. Cost: each
   unarchived scheduled session holds about 300 MiB of the pod's memory. Under low memory the supervisor stops
   pinned idle sessions too.
-- **Resume only what claude.ai reports active.** The resume reads the same endpoint and borrowed token as the
-  sweep. An expired token or any answer but `active` skips the session. It then stays disconnected until you
-  resume it by hand, see [runbooks/02_sessions.md](runbooks/02_sessions.md).
+- **Resume everything claude.ai has not archived or deleted.** The job state `done` only means the last turn
+  ended, so it cannot tell a finished session from an idle one. The resume reads the same endpoint and borrowed
+  token as the sweep. An error answer from claude.ai still resumes the session. An expired token skips all of
+  them. They then stay disconnected until you resume them by hand, see
+  [runbooks/02_sessions.md](runbooks/02_sessions.md).
 
 - **A folder per session, from `--spawn worktree` and a WorktreeCreate hook.** Git worktrees of one repo do not
   fit sessions that clone several repos. The hook-created folder is empty, and Claude clones into it.

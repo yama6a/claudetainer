@@ -4,7 +4,7 @@
 # renovate: datasource=npm depName=@anthropic-ai/claude-code
 ARG CLAUDE_VERSION=2.1.318
 # renovate: datasource=git-refs depName=https://github.com/anthropics/claude-plugins-official branch=main
-ARG CLAUDE_PLUGINS_REF=fa4eb54397ee2faccb6940512a19c017cb1337f3
+ARG CLAUDE_PLUGINS_REF=a1ecfbc7f138a0ef455088f7f28cda2d22a0f853
 # renovate: datasource=npm depName=@playwright/mcp
 ARG PLAYWRIGHT_MCP_VERSION=0.0.84
 # renovate: datasource=github-releases depName=kubernetes/kubernetes
@@ -22,7 +22,7 @@ ARG KUBECONFORM_VERSION=v0.8.0
 # renovate: datasource=github-releases depName=bitnami-labs/sealed-secrets
 ARG KUBESEAL_VERSION=v0.41.2
 # renovate: datasource=github-releases depName=mikefarah/yq
-ARG YQ_VERSION=v4.54.1
+ARG YQ_VERSION=v4.54.2
 # renovate: datasource=github-releases depName=siderolabs/talos
 ARG TALOSCTL_VERSION=v1.14.5
 # renovate: datasource=github-releases depName=golangci/golangci-lint
@@ -48,7 +48,7 @@ ARG PGCLI_VERSION=4.7.1
 # renovate: datasource=docker depName=postgres
 ARG PG_MAJOR=18
 # renovate: datasource=github-releases depName=jdx/mise
-ARG MISE_VERSION=v2026.11.2
+ARG MISE_VERSION=v2026.11.3
 # renovate: datasource=git-refs depName=https://github.com/jdx/vfox-php branch=main
 ARG VFOX_PHP_REF=818b3ba08fb4718ece6e6382b36cdde85357cbb5
 # renovate: datasource=github-tags depName=php/php-src
@@ -78,7 +78,7 @@ ARG HADOLINT_VERSION=v2.15.1
 # renovate: datasource=pypi depName=yamllint
 ARG YAMLLINT_VERSION=1.38.0
 # renovate: datasource=npm depName=renovate
-ARG RENOVATE_VERSION=44.219.0
+ARG RENOVATE_VERSION=44.221.5
 # renovate: datasource=npm depName=prettier
 ARG PRETTIER_VERSION=3.9.10
 # renovate: datasource=github-releases depName=go-delve/delve
@@ -89,7 +89,7 @@ ARG MCP_VICTORIAMETRICS_VERSION=v1.20.2
 ARG MCP_VICTORIALOGS_VERSION=v1.9.0
 
 # Cross-compiles on the build machine's architecture, so this stage needs no emulation.
-FROM --platform=$BUILDPLATFORM golang:1.27-alpine@sha256:d200d2dd76b03a99b52651fd1325aff7dcd35422c35c01bac56571b0507f3deb AS exporter
+FROM --platform=$BUILDPLATFORM golang:1.27-alpine@sha256:fa3d596898d9f126af7c01d14ee7597bab3f39cccf392ef36b69fe77cd681f18 AS exporter
 ARG TARGETOS
 ARG TARGETARCH
 WORKDIR /src

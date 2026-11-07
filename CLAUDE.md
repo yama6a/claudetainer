@@ -28,6 +28,8 @@ make smoke       # after any Dockerfile, rootfs or Go change
 
 ## Rules
 
+- This repo is public and reusable by anyone. Never add facts about one cluster: hosts, namespaces, app names,
+  private repo names, secrets, or skills for one setup. They belong in the operator's private GitOps repo.
 - Shell: `#!/usr/bin/env bash`, `set -euo pipefail`, shfmt `-i 2 -ci -bn -sr`. Knobs in a `# ---- knobs ----`
   block with one trailing comment each.
 - ASCII only, in code and docs.

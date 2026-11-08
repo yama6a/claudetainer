@@ -58,6 +58,11 @@
       allowedVersions: "/^v26\\./",
     },
     {
+      description: "npm stays on 11, the major both Node lines ship",
+      matchDepNames: ["npm"],
+      allowedVersions: "/^11\\./",
+    },
+    {
       // Four ARGs track php/php-src. Each stays on its own minor, which the image offers through mise.
       description: "php-src tags are php-X.Y.Z, the ARGs are X.Y.Z",
       matchDepNames: ["php/php-src"],

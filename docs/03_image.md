@@ -113,3 +113,10 @@ Skills for every session live in `rootfs/etc/claude-code/.claude/skills/`. Claud
 The build runs natively per architecture, because the apt and Playwright installs are slow and fragile under
 QEMU. The smoke test asserts that every tool answers with the exact pinned version, from the expected path.
 Required checks: `go / go`, `shell`, `yaml`, `renovate-config`, `build-amd64`, `build-arm64`.
+
+## Known vulnerabilities
+
+The release build scans the image with Trivy and fails on a HIGH or CRITICAL finding that has a fixed version.
+`.trivyignore` at the repo root lists the findings that a Dockerfile change cannot fix. They sit in prebuilt Go
+tools that upstream built with an older Go, in the docker CLI plugins of the base image, and in Intelephense's npm
+dependencies. A new finding still fails the build. When a tool bump clears a finding, delete its line.

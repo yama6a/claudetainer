@@ -1,0 +1,289 @@
+# Findings that Trivy reports in the image and that no Dockerfile change can fix.
+# Each group names the file or package that carries the finding. Remove a group when its version bump clears it.
+# CI fails on any HIGH or CRITICAL finding with a fix that is not listed here.
+
+# Prebuilt actionlint v1.7.12: upstream release built with an older Go or older modules, so it carries findings in the Go standard library of Go 1.26.1
+CVE-2026-111943
+CVE-2026-27145
+CVE-2026-32280
+CVE-2026-32281
+CVE-2026-32283
+CVE-2026-33810
+CVE-2026-33811
+CVE-2026-33814
+CVE-2026-33818
+CVE-2026-39820
+CVE-2026-39821
+CVE-2026-39822
+CVE-2026-39836
+CVE-2026-42499
+CVE-2026-42504
+CVE-2026-46600
+CVE-2026-56853
+CVE-2026-56858
+CVE-2026-56859
+CVE-2026-56860
+CVE-2026-56862
+CVE-2026-78667
+CVE-2026-78669
+CVE-2026-97031
+
+# Prebuilt dlv v1.27.2: upstream release built with an older Go or older modules, so it carries findings in the Go standard library of Go 1.27.1
+CVE-2026-111943
+CVE-2026-78667
+CVE-2026-78669
+CVE-2026-97031
+
+# Prebuilt golangci-lint v2.15.0: upstream release built with an older Go or older modules, so it carries findings in the Go standard library of Go 1.27.0
+CVE-2026-111943
+CVE-2026-78667
+CVE-2026-78669
+CVE-2026-97031
+
+# Prebuilt helm v4.3.1: upstream release built with an older Go or older modules, so it carries findings in the Go standard library of Go 1.27.2 and Go modules golang.org/x/net
+CVE-2026-78661  # golang.org/x/net v0.60.0
+CVE-2026-111943
+
+# Prebuilt k9s v0.51.0: upstream release built with an older Go or older modules, so it carries findings in the Go standard library of Go 1.26.1 and Go modules github.com/containerd/containerd, github.com/containerd/containerd/v2, github.com/go-git/go-git/v5, github.com/go-jose/go-jose/v4, github.com/klauspost/compress, golang.org/x/crypto, golang.org/x/mod, golang.org/x/net, golang.org/x/text, google.golang.org/grpc, oras.land/oras-go/v2
+CVE-2026-53488  # github.com/containerd/containerd v1.7.32
+CVE-2026-53489  # github.com/containerd/containerd/v2 v2.2.4
+CVE-2026-53492  # github.com/containerd/containerd/v2 v2.2.4
+CVE-2026-95837  # github.com/containerd/containerd/v2 v2.2.4
+CVE-2026-71556  # github.com/go-git/go-git/v5 v5.19.1
+CVE-2026-116587  # github.com/go-jose/go-jose/v4 v4.1.4
+CVE-2026-63209  # github.com/klauspost/compress v1.18.5
+CVE-2026-39828  # golang.org/x/crypto v0.50.0
+CVE-2026-39829  # golang.org/x/crypto v0.50.0
+CVE-2026-39830  # golang.org/x/crypto v0.50.0
+CVE-2026-39831  # golang.org/x/crypto v0.50.0
+CVE-2026-39832  # golang.org/x/crypto v0.50.0
+CVE-2026-39835  # golang.org/x/crypto v0.50.0
+CVE-2026-42508  # golang.org/x/crypto v0.50.0
+CVE-2026-46595  # golang.org/x/crypto v0.50.0
+CVE-2026-46597  # golang.org/x/crypto v0.50.0
+CVE-2026-56854  # golang.org/x/crypto v0.50.0
+CVE-2026-56864  # golang.org/x/mod v0.35.0
+CVE-2026-56865  # golang.org/x/mod v0.35.0
+CVE-2026-25681  # golang.org/x/net v0.53.0
+CVE-2026-27136  # golang.org/x/net v0.53.0
+CVE-2026-39821  # golang.org/x/net v0.53.0
+CVE-2026-46600  # golang.org/x/net v0.53.0
+CVE-2026-78661  # golang.org/x/net v0.53.0
+CVE-2026-78669  # golang.org/x/net v0.53.0
+CVE-2026-56851  # golang.org/x/text v0.36.0
+CVE-2026-56852  # golang.org/x/text v0.36.0
+CVE-2026-84304  # google.golang.org/grpc v1.79.3
+CVE-2026-84445  # google.golang.org/grpc v1.79.3
+GHSA-hrxh-6v49-42gf  # google.golang.org/grpc v1.79.3
+CVE-2026-50151  # oras.land/oras-go/v2 v2.6.0
+CVE-2026-50163  # oras.land/oras-go/v2 v2.6.0
+CVE-2026-85731  # oras.land/oras-go/v2 v2.6.0
+CVE-2026-111943
+CVE-2026-27145
+CVE-2026-32280
+CVE-2026-32281
+CVE-2026-32283
+CVE-2026-33810
+CVE-2026-33811
+CVE-2026-33814
+CVE-2026-33818
+CVE-2026-39820
+CVE-2026-39822
+CVE-2026-39836
+CVE-2026-42499
+CVE-2026-42504
+CVE-2026-56853
+CVE-2026-56858
+CVE-2026-56859
+CVE-2026-56860
+CVE-2026-56862
+CVE-2026-78667
+CVE-2026-97031
+
+# Prebuilt kubeconform v0.8.0: upstream release built with an older Go or older modules, so it carries findings in the Go standard library of Go 1.26.3 and Go modules golang.org/x/text
+CVE-2026-56851  # golang.org/x/text v0.37.0
+CVE-2026-56852  # golang.org/x/text v0.37.0
+CVE-2026-111943
+CVE-2026-27145
+CVE-2026-33818
+CVE-2026-39821
+CVE-2026-39822
+CVE-2026-42504
+CVE-2026-46600
+CVE-2026-56853
+CVE-2026-56858
+CVE-2026-56859
+CVE-2026-56860
+CVE-2026-56862
+CVE-2026-78667
+CVE-2026-78669
+CVE-2026-97031
+
+# Prebuilt kubectl v1.37.2: upstream release built with an older Go or older modules, so it carries findings in the Go modules golang.org/x/net, golang.org/x/text
+CVE-2026-78661  # golang.org/x/net v0.57.0
+CVE-2026-78669  # golang.org/x/net v0.57.0
+CVE-2026-56851  # golang.org/x/text v0.40.0
+
+# Prebuilt kubectx v0.11.0: upstream release built with an older Go or older modules, so it carries findings in the Go standard library of Go 1.25.8 and Go modules golang.org/x/net, golang.org/x/text
+CVE-2026-25681  # golang.org/x/net v0.47.0
+CVE-2026-27136  # golang.org/x/net v0.47.0
+CVE-2026-33814  # golang.org/x/net v0.47.0
+CVE-2026-39821  # golang.org/x/net v0.47.0
+CVE-2026-46600  # golang.org/x/net v0.47.0
+CVE-2026-78661  # golang.org/x/net v0.47.0
+CVE-2026-78669  # golang.org/x/net v0.47.0
+CVE-2026-56851  # golang.org/x/text v0.31.0
+CVE-2026-56852  # golang.org/x/text v0.31.0
+CVE-2026-111943
+CVE-2026-27145
+CVE-2026-32280
+CVE-2026-32281
+CVE-2026-32283
+CVE-2026-33811
+CVE-2026-33818
+CVE-2026-39820
+CVE-2026-39822
+CVE-2026-39836
+CVE-2026-42499
+CVE-2026-42504
+CVE-2026-56853
+CVE-2026-56858
+CVE-2026-56859
+CVE-2026-56860
+CVE-2026-56862
+CVE-2026-78667
+CVE-2026-97031
+
+# Prebuilt kubens v0.11.0: upstream release built with an older Go or older modules, so it carries findings in the Go standard library of Go 1.25.8 and Go modules golang.org/x/net, golang.org/x/text
+CVE-2026-25681  # golang.org/x/net v0.47.0
+CVE-2026-27136  # golang.org/x/net v0.47.0
+CVE-2026-33814  # golang.org/x/net v0.47.0
+CVE-2026-39821  # golang.org/x/net v0.47.0
+CVE-2026-46600  # golang.org/x/net v0.47.0
+CVE-2026-78661  # golang.org/x/net v0.47.0
+CVE-2026-78669  # golang.org/x/net v0.47.0
+CVE-2026-56851  # golang.org/x/text v0.31.0
+CVE-2026-56852  # golang.org/x/text v0.31.0
+CVE-2026-111943
+CVE-2026-27145
+CVE-2026-32280
+CVE-2026-32281
+CVE-2026-32283
+CVE-2026-33811
+CVE-2026-33818
+CVE-2026-39820
+CVE-2026-39822
+CVE-2026-39836
+CVE-2026-42499
+CVE-2026-42504
+CVE-2026-56853
+CVE-2026-56858
+CVE-2026-56859
+CVE-2026-56860
+CVE-2026-56862
+CVE-2026-78667
+CVE-2026-97031
+
+# Prebuilt kubeseal v0.41.2: upstream release built with an older Go or older modules, so it carries findings in the Go modules golang.org/x/net
+CVE-2026-78661  # golang.org/x/net v0.60.0
+
+# Prebuilt kustomize v5.8.3: upstream release built with an older Go or older modules, so it carries findings in the Go standard library of Go 1.27.1
+CVE-2026-111943
+CVE-2026-78667
+CVE-2026-78669
+CVE-2026-97031
+
+# Prebuilt mcp-victorialogs v1.9.0: upstream release built with an older Go or older modules, so it carries findings in the Go standard library of Go 1.26.2 and Go modules github.com/klauspost/compress, golang.org/x/text
+CVE-2026-63209  # github.com/klauspost/compress v1.18.4
+CVE-2026-56851  # golang.org/x/text v0.34.0
+CVE-2026-56852  # golang.org/x/text v0.34.0
+CVE-2026-111943
+CVE-2026-27145
+CVE-2026-33811
+CVE-2026-33814
+CVE-2026-33818
+CVE-2026-39820
+CVE-2026-39821
+CVE-2026-39822
+CVE-2026-39836
+CVE-2026-42499
+CVE-2026-42504
+CVE-2026-46600
+CVE-2026-56853
+CVE-2026-56858
+CVE-2026-56859
+CVE-2026-56860
+CVE-2026-56862
+CVE-2026-78667
+CVE-2026-78669
+CVE-2026-97031
+
+# Prebuilt mcp-victoriametrics v1.20.2: upstream release built with an older Go or older modules, so it carries findings in the Go standard library of Go 1.26.2 and Go modules github.com/klauspost/compress, golang.org/x/net, golang.org/x/text
+CVE-2026-63209  # github.com/klauspost/compress v1.18.5
+CVE-2026-25681  # golang.org/x/net v0.52.0
+CVE-2026-27136  # golang.org/x/net v0.52.0
+CVE-2026-33814  # golang.org/x/net v0.52.0
+CVE-2026-39821  # golang.org/x/net v0.52.0
+CVE-2026-46600  # golang.org/x/net v0.52.0
+CVE-2026-78661  # golang.org/x/net v0.52.0
+CVE-2026-78669  # golang.org/x/net v0.52.0
+CVE-2026-56851  # golang.org/x/text v0.35.0
+CVE-2026-56852  # golang.org/x/text v0.35.0
+CVE-2026-111943
+CVE-2026-27145
+CVE-2026-33811
+CVE-2026-33818
+CVE-2026-39820
+CVE-2026-39822
+CVE-2026-39836
+CVE-2026-42499
+CVE-2026-42504
+CVE-2026-56853
+CVE-2026-56858
+CVE-2026-56859
+CVE-2026-56860
+CVE-2026-56862
+CVE-2026-78667
+CVE-2026-97031
+
+# Prebuilt oapi-codegen v2.8.2: upstream release built with an older Go or older modules, so it carries findings in the Go modules github.com/getkin/kin-openapi, golang.org/x/mod, golang.org/x/text
+CVE-2026-100349  # github.com/getkin/kin-openapi v0.142.0
+CVE-2026-100352  # github.com/getkin/kin-openapi v0.142.0
+CVE-2026-100353  # github.com/getkin/kin-openapi v0.142.0
+CVE-2026-100354  # github.com/getkin/kin-openapi v0.142.0
+CVE-2026-97394  # github.com/getkin/kin-openapi v0.142.0
+GHSA-r277-6w6q-xmqw  # github.com/getkin/kin-openapi v0.142.0
+CVE-2026-56864  # golang.org/x/mod v0.38.0
+CVE-2026-56865  # golang.org/x/mod v0.38.0
+CVE-2026-56851  # golang.org/x/text v0.40.0
+
+# Prebuilt shfmt v3.14.1: upstream release built with an older Go or older modules, so it carries findings in the Go standard library of Go 1.27.1
+CVE-2026-111943
+CVE-2026-78667
+CVE-2026-78669
+CVE-2026-97031
+
+# Prebuilt talosctl v1.14.5: upstream release built with an older Go or older modules, so it carries findings in the Go modules golang.org/x/net
+CVE-2026-78661  # golang.org/x/net v0.61.0
+
+# gh from the docker/sandbox-templates base image, a prebuilt Go binary at /usr/bin/gh
+CVE-2026-78661  # golang.org/x/net v0.60.0
+
+# pebble from the docker/sandbox-templates base image, a prebuilt Go binary at /usr/bin/pebble
+CVE-2026-111943
+CVE-2026-78667
+CVE-2026-78669
+CVE-2026-97031
+
+# docker-buildx from the docker/sandbox-templates base image, a prebuilt Go binary at /usr/libexec/docker/cli-plugins/docker-buildx
+CVE-2026-17106  # github.com/moby/go-archive v0.2.0
+CVE-2026-78661  # golang.org/x/net v0.59.0
+CVE-2026-78669  # golang.org/x/net v0.59.0
+
+# docker-compose from the docker/sandbox-templates base image, a prebuilt Go binary at /usr/libexec/docker/cli-plugins/docker-compose
+CVE-2026-78661  # golang.org/x/net v0.58.0
+CVE-2026-78669  # golang.org/x/net v0.58.0
+
+# Intelephense 1.18.5 bundles these npm dependencies, and the newest Intelephense still carries them
+CVE-2026-102990  # basic-ftp 5.3.1
+CVE-2026-48712  # protobufjs 8.3.0

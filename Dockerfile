@@ -43,6 +43,8 @@ ARG NVM_VERSION=v0.41.0
 ARG NODE24_VERSION=v24.22.2
 # renovate: datasource=github-tags depName=nodejs/node
 ARG NODE26_VERSION=v26.13.0
+# renovate: datasource=npm depName=npm
+ARG NPM_VERSION=11.21.2
 # renovate: datasource=pypi depName=pgcli
 ARG PGCLI_VERSION=4.7.1
 # renovate: datasource=docker depName=postgres
@@ -118,12 +120,14 @@ RUN SUDO_FORCE_REMOVE=yes apt-get purge -y sudo \
     && sed -i '/Docker Sandbox/,/^export BASH_ENV/d' /etc/bash.bashrc
 
 # The PHP headers stay in the final image, because sessions compile further PHP versions without apt.
+# The base ships an apt with a fixable HIGH CVE, so the install also upgrades apt.
 ARG PG_MAJOR
 RUN apt-get update && apt-get install -y --no-install-recommends \
       build-essential file gnupg perl pkg-config python3 sqlite3 wget zip \
       autoconf bison re2c libbz2-dev libcurl4-openssl-dev libfreetype-dev libgmp-dev libicu-dev libjpeg-dev \
       libonig-dev libpng-dev libreadline-dev libsodium-dev libsqlite3-dev libssl-dev libwebp-dev libxml2-dev \
       libzip-dev \
+    && apt-get install -y --no-install-recommends --only-upgrade apt libapt-pkg7.0 \
     && install -m 0755 -d /etc/apt/keyrings \
     && curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc -o /etc/apt/keyrings/postgresql.asc \
     && echo "deb [arch=${TARGETARCH} signed-by=/etc/apt/keyrings/postgresql.asc] https://apt.postgresql.org/pub/repos/apt $(sed -n "s/^VERSION_CODENAME=//p" /etc/os-release)-pgdg main" \
@@ -248,9 +252,11 @@ RUN export PATH="/usr/local/go/bin:${PATH}" GOFLAGS=-trimpath GOBIN=/usr/local/b
 
 # The pod user owns /opt/nvm, so `npm install -g` and `nvm install` work. Those writes are shared by all
 # sessions and vanish on restart. /opt/nvm/current is the default Node for processes that never load nvm.
+# The npm that ships with each Node bundles an undici and a brace-expansion with fixable CVEs, so install a pinned npm.
 ARG NVM_VERSION
 ARG NODE24_VERSION
 ARG NODE26_VERSION
+ARG NPM_VERSION
 ENV NVM_DIR=/opt/nvm
 # hadolint ignore=SC1091
 RUN mkdir -p "${NVM_DIR}" \
@@ -258,7 +264,9 @@ RUN mkdir -p "${NVM_DIR}" \
     && unset NPM_CONFIG_PREFIX \
     && . "${NVM_DIR}/nvm.sh" \
     && nvm install "${NODE24_VERSION}" \
+    && nvm exec "${NODE24_VERSION}" npm install -g --no-audit --no-fund "npm@${NPM_VERSION}" \
     && nvm install "${NODE26_VERSION}" \
+    && nvm exec "${NODE26_VERSION}" npm install -g --no-audit --no-fund "npm@${NPM_VERSION}" \
     && nvm alias default "${NODE26_VERSION}" \
     && ln -s "versions/node/${NODE26_VERSION}" "${NVM_DIR}/current" \
     && nvm cache clear \

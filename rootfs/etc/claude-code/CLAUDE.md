@@ -70,3 +70,13 @@ All sessions share one memory limit. When the pod reaches it, the pod restarts a
   the pod.
 - Change other namespaces only when the user asks. Pull requests to the cluster's GitOps repo manage the live
   cluster, and Argo CD reverts manual changes.
+
+## Show files to the user
+
+The user reads the session in the Claude app or on claude.ai. Sessions here are not on a project thread, so
+`SendUserFile` fails with "nowhere to place a file".
+
+- Image, such as a screenshot: save it in your session folder, then open it with the Read tool. The app shows every
+  image you read as a thumbnail.
+- Text or Markdown: put the content in your reply. The app renders Markdown.
+- Never push a file to GitHub only to show it to the user.

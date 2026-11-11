@@ -55,7 +55,8 @@ For an entry with a gate, `gate: no session needed` is also a normal result. The
 kubectl -n claudetainer rollout restart deploy/claudetainer
 ```
 
-Expected: sessions pause and answer again within a few minutes. A turn that was running is lost.
+Expected: the new pod logs `wake: <session ID>: woken` for each session that was busy at the stop. Those
+sessions continue within a minute. The others answer when you open them.
 
 ## A session is gone after a long outage
 

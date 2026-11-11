@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
-# Sourced by sweep.sh and bg-sessions.sh. Asks claude.ai for a session's state. The caller defines log().
+# Sourced by sweep.sh, bg-sessions.sh and wake.sh. Asks claude.ai for a session's state, or sends it a message.
+# The caller defines log().
 
 # ---- knobs ----
-API=https://api.anthropic.com # where claude.ai answers for a session's state
+API=https://api.anthropic.com # where claude.ai answers for a session
 
 CONFIG="${CLAUDE_CONFIG_DIR:-/home/agent/.claude}"
 
@@ -28,4 +29,15 @@ session_status() {
     *) echo "HTTP $code" ;;
   esac
   rm -f "$body"
+}
+
+# Undocumented: the endpoint claude.ai posts a typed message to. The session sees the message as sent by another
+# session, so it never takes it as the user's answer. Prints the HTTP status.
+post_message() {
+  local body
+  body="$(jq -nc --arg uuid "$(cat /proc/sys/kernel/random/uuid)" --arg text "$2" \
+    '{events: [{payload: {type: "user", uuid: $uuid, message: {role: "user", content: $text}}}]}')"
+  curl -sS -m 15 -o /dev/null -w '%{http_code}' -X POST -H "Authorization: Bearer $token" \
+    -H 'anthropic-version: 2023-06-01' -H 'content-type: application/json' -d "$body" \
+    "$API/v1/code/sessions/${1/#session_/cse_}/events" || echo 000
 }

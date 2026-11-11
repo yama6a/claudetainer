@@ -32,6 +32,7 @@ in `chart-draft/`, which git ignores. Procedures are in [runbooks/05_deployment.
 | cpu | 500m request, no limit | actual node CPU use is 16 to 24 percent |
 | `/dev/shm` | 1 GiB memory volume | Chromium dies on real pages with the 64 MiB default |
 | `terminationGracePeriodSeconds` | 120 | the server gives sessions 30 s to stop, then cleans up |
+| preStop hook | `/usr/local/lib/claudetainer/wake.sh save` | copies each session's status for the wake after the restart, see [02_sessions.md](02_sessions.md) |
 | user | uid and gid 1000, `fsGroup` 1000, `OnRootMismatch` | a fresh Longhorn volume mounts as root. Without `OnRootMismatch`, every start chowns 100 GiB |
 | probes | none | the container exits when the server exits |
 | sidecar | `login-exporter`, 16 MiB request, 32 MiB limit, read-only root filesystem | reads the config volume read-only |

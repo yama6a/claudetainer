@@ -34,7 +34,6 @@ Every version is an `ARG` at the top of the `Dockerfile`, with a `# renovate:` l
 | Lint | shellcheck, shfmt, actionlint, hadolint, yamllint, prettier, Renovate |
 | Databases | psql 18 from PGDG, pgcli, sqlite3 |
 | Base extras | file, wget, zip, a `uvx` wrapper around `uv tool run` |
-| MCP servers | mcp-victoriametrics, mcp-victorialogs |
 | Browser | Playwright Chromium and the Playwright MCP server |
 | Metrics | `login-exporter`, built from `cmd/login-exporter/` in a Go stage of the same Dockerfile |
 
@@ -51,9 +50,9 @@ there.
 - The context7 plugin sends `${CONTEXT7_API_KEY}` from the environment upstream. The copy uses a headersHelper,
   `context7-headers.sh`, which reads the key from the Secret file. Without the file, context7 runs anonymously.
 - The browser comes from the MCP server's own Playwright, so its revision always matches the server.
-- Two plugins of our own, victoriametrics and victorialogs, live in `build/plugins/`. They run the pinned MCP
-  servers and read the server URLs from the pod environment. The start script installs each one only when the pod
-  sets its URL: `VM_INSTANCE_ENTRYPOINT`, or `VL_INSTANCE_ENTRYPOINT`. `VM_INSTANCE_TYPE` defaults to `single`.
+- No VictoriaMetrics or VictoriaLogs MCP server. Each session starts its own copy over stdio. mcp-victoriametrics
+  holds about 560 MiB and mcp-victorialogs about 95 MiB, so 8 sessions used about 4 GiB. Sessions curl the HTTP
+  APIs at `$VM_INSTANCE_ENTRYPOINT` and `$VL_INSTANCE_ENTRYPOINT` instead.
 
 ## Skills
 

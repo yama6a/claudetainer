@@ -1,4 +1,0 @@
-{
-  "name": "victoriametrics",
-  "description": "Query VictoriaMetrics: PromQL, series, alert rules"
-}

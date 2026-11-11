@@ -71,7 +71,20 @@ Background sessions run under Claude Code's own supervisor process inside the po
   only its own sessions. So the start script runs `claude respawn` for the scheduled ones. That continues the
   same session under the same claude.ai entry. `claude --bg --resume` would start a copy with no claude.ai
   connection, because the old pod's session records still look live.
-  A turn that was running is lost, as with the server's sessions.
+- **A wake message for each session busy at the stop.** After a restart the server starts a session only when
+  claude.ai sends it something. `wake.sh run` posts one message to each session that was busy, once the server
+  has registered. It skips sessions that already run and sessions claude.ai reports archived or deleted.
+  Claude Code resumes the work on its own. The message only makes the server start the process.
+- **Busy, from Claude Code's own status file.** Each session process keeps a status in
+  `~/.claude/sessions/<pid>.json`: `busy`, `waiting` or `idle`. `busy` covers a running turn and background tasks
+  after the turn ended. `waiting` means a question or a permission prompt is open. A message would make the session
+  guess the answer, so a waiting session gets none.
+- **The status copied by a preStop hook.** Claude Code deletes its status file on a clean exit. So the chart's
+  preStop hook runs `wake.sh save` before Kubernetes stops the container. A killed process leaves its file behind,
+  so after an out-of-memory kill `wake.sh run` reads the files of the processes started since the last start.
+- **The wake message through an undocumented endpoint.** `POST /v1/code/sessions/<id>/events` is what claude.ai
+  posts a typed message to. The session sees the message as sent by another session, so it never takes it as
+  your answer.
 - **A pin per scheduled session.** No setting changes the 8-hour idle stop in Claude Code 2.1.316. A pin is the
   only exemption. `bg-sessions.sh` edits `~/.claude/jobs/pins.json` under the lock the supervisor uses. Cost: each
   unarchived scheduled session holds about 300 MiB of the pod's memory. Under low memory the supervisor stops

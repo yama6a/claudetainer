@@ -29,14 +29,20 @@ Session handling is in [02_sessions.md](02_sessions.md), the image in [03_image.
 
 ## Restarts
 
-`claude remote-control` started again in the same folder, with the same config, brings back every session it
-served. This works for about 4 hours after it stopped. So a restart pauses all sessions and resumes them, as
-long as `~/.claude` and `/workspace` survive it. Both are Longhorn volumes.
+`claude remote-control` started again in the same folder, with the same config, takes back every session it
+served. It starts a session's process only when claude.ai sends that session something: you open it, or a
+message arrives. This works for about 4 hours after the server stopped, as long as `~/.claude` and `/workspace`
+survive the restart. Both are Longhorn volumes.
+
+A session that was busy at the stop gets a wake message, see [02_sessions.md](02_sessions.md). Busy means a
+turn or a background task was running. Claude Code then resumes the cut-off turn and restarts the lost
+background tasks itself.
 
 | Event | Effect |
 |---|---|
-| A deploy, a Reloader restart, a node drain | every session pauses for the restart, then resumes. A turn that was running is lost |
-| The server exits after about 10 minutes without network | Kubernetes restarts the container, sessions resume |
+| A deploy, a Reloader restart, a node drain | busy sessions resume within a minute. The others resume when you open them |
+| The container is killed, for example out of memory | the same, from the status files of the killed processes |
+| The server exits after about 10 minutes without network | Kubernetes restarts the container. Sessions resume when you open them |
 | The pod stays down longer than about 4 hours | its sessions stay archived. Start new ones. The old folders stay until the sweep |
 
 ## Decisions
@@ -53,8 +59,8 @@ long as `~/.claude` and `/workspace` survive it. Both are Longhorn volumes.
 - **Deployment with `strategy: Recreate`, fixed hostname.** Two servers on one folder archive each other's
   sessions, and both volumes are ReadWriteOnce. The pod hostname names the server in the picker, so it stays
   `claudetainer` across restarts.
-- **Auto-deploy every release, like codarr.** Every merged Renovate bump restarts the pod. Sessions resume, a
-  running turn is lost.
+- **Auto-deploy every release, like codarr.** Every merged Renovate bump restarts the pod. Busy sessions resume
+  their work.
 - **No node preference.** The pod may run on a Pi. There only about 2 GiB of memory is free, so the 6 GiB limit
   is only real on tc-w1.
 - **No web terminal, no Go supervisor.** Kubernetes restarts the server. The login comes from a sealed token,

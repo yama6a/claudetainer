@@ -28,7 +28,7 @@ No sudo, no apt. Put a missing tool in `~/.local/bin`, or add it to the image wi
 | Lint | shellcheck, shfmt, actionlint, hadolint, yamllint, prettier, renovate, renovate-config-validator |
 | Databases | psql 18, pgcli, sqlite3. A Postgres 18 server on `localhost:5432` in a sidecar container |
 | Browser | headless Chromium through the Playwright MCP server |
-| Plugins | gopls-lsp, php-lsp, feature-dev, context7, playwright. victoriametrics and victorialogs when the pod configures them |
+| Plugins | gopls-lsp, php-lsp, feature-dev, context7, playwright |
 
 - No Docker daemon. `docker build`, `docker run` and `act` fail.
 - Postgres: `PGSANDBOX_DSN` points at the sidecar, so pgsandbox tests run here. Each test process gets databases
@@ -60,8 +60,8 @@ All sessions share one memory limit. When the pod reaches it, the pod restarts a
 
 - kubectl has cluster-admin. The default namespace is `claudetainer-scratch`.
 - Deploy experiments to `claudetainer-scratch` only. Its quota is small. Objects older than 7 days are deleted.
-- Query VictoriaMetrics and VictoriaLogs through their MCP tools. For an endpoint the tools lack, curl
-  `$VM_INSTANCE_ENTRYPOINT` or `$VL_INSTANCE_ENTRYPOINT` from this pod. Never start a pod to query them.
+- Query VictoriaMetrics and VictoriaLogs with curl from this pod, at `$VM_INSTANCE_ENTRYPOINT` and
+  `$VL_INSTANCE_ENTRYPOINT`, when the pod sets them. Never start a pod to query them.
 - Start a scratch pod only for what this pod cannot do: run a container image, or test on a node of another
   architecture or under a memory limit. For another in-cluster service, use `kubectl port-forward` from here.
 - Delete every scratch pod you start before you finish, then check with `kubectl get pods`. A finished pod that

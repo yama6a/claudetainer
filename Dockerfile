@@ -85,10 +85,6 @@ ARG RENOVATE_VERSION=44.230.1
 ARG PRETTIER_VERSION=3.10.0
 # renovate: datasource=github-releases depName=go-delve/delve
 ARG DELVE_VERSION=v1.27.2
-# renovate: datasource=github-releases depName=VictoriaMetrics/mcp-victoriametrics
-ARG MCP_VICTORIAMETRICS_VERSION=v1.20.2
-# renovate: datasource=github-releases depName=VictoriaMetrics/mcp-victorialogs
-ARG MCP_VICTORIALOGS_VERSION=v1.9.0
 
 # Cross-compiles on the build machine's architecture, so this stage needs no emulation.
 FROM --platform=$BUILDPLATFORM golang:1.27-alpine@sha256:eb61c3873c97416fff0116553fff65d67a3549f72e11d9758849a689cdd8b523 AS exporter
@@ -200,8 +196,6 @@ ARG SHFMT_VERSION
 ARG ACTIONLINT_VERSION
 ARG HADOLINT_VERSION
 ARG DELVE_VERSION
-ARG MCP_VICTORIAMETRICS_VERSION
-ARG MCP_VICTORIALOGS_VERSION
 RUN set -eux; \
     case "${TARGETARCH}" in \
       amd64) alt_arch=x86_64 ;; \
@@ -234,9 +228,7 @@ RUN set -eux; \
     chmod 0755 /usr/local/bin/shfmt /usr/local/bin/hadolint; \
     curl -fsSL "https://github.com/rhysd/actionlint/releases/download/${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION#v}_linux_${TARGETARCH}.tar.gz" | tar -xz -C /tmp actionlint; \
     curl -fsSL "https://github.com/go-delve/delve/releases/download/${DELVE_VERSION}/dlv_${DELVE_VERSION#v}_linux_${TARGETARCH}.tar.gz" | tar -xz -C /tmp dlv; \
-    curl -fsSL "https://github.com/VictoriaMetrics/mcp-victoriametrics/releases/download/${MCP_VICTORIAMETRICS_VERSION}/mcp-victoriametrics_Linux_${alt_arch}.tar.gz" | tar -xz -C /tmp mcp-victoriametrics; \
-    curl -fsSL "https://github.com/VictoriaMetrics/mcp-victorialogs/releases/download/${MCP_VICTORIALOGS_VERSION}/mcp-victorialogs_Linux_${alt_arch}.tar.gz" | tar -xz -C /tmp mcp-victorialogs; \
-    install -m 0755 /tmp/actionlint /tmp/dlv /tmp/mcp-victoriametrics /tmp/mcp-victorialogs /usr/local/bin/; \
+    install -m 0755 /tmp/actionlint /tmp/dlv /usr/local/bin/; \
     rm -rf /tmp/*
 
 ARG GOPLS_VERSION
@@ -332,10 +324,9 @@ RUN npm install --prefix /opt/playwright-mcp --no-audit --no-fund "@playwright/m
     && rm -rf /var/lib/apt/lists/* /root/.npm
 
 # The marketplace is renamed because Claude Code reserves claude-plugins-official for the GitHub source.
-# Only the five plugins the pod enables are kept, plus the two VictoriaMetrics plugins from build/plugins/. playwright runs the pinned server above, not @latest, and
+# Only the five plugins the pod enables are kept. playwright runs the pinned server above, not @latest, and
 # context7 reads its API key from a Secret file through a headersHelper, not from an environment variable.
 ARG CLAUDE_PLUGINS_REF
-COPY build/plugins/ /opt/claudetainer-plugins/plugins/
 RUN mkdir -p /opt/claudetainer-plugins \
     && curl -fsSL "https://codeload.github.com/anthropics/claude-plugins-official/tar.gz/${CLAUDE_PLUGINS_REF}" \
       | tar -xz -C /opt/claudetainer-plugins --strip-components=1 \
@@ -347,13 +338,9 @@ RUN mkdir -p /opt/claudetainer-plugins \
         "claude-plugins-official-${CLAUDE_PLUGINS_REF}/external_plugins/playwright" \
     && m=/opt/claudetainer-plugins/.claude-plugin/marketplace.json \
     && jq '.name = "claudetainer-plugins" \
-      | .plugins |= map(select(.name | IN("gopls-lsp", "php-lsp", "feature-dev", "context7", "playwright"))) \
-      | .plugins += [ \
-          {name: "victoriametrics", source: "./plugins/victoriametrics", description: "Query VictoriaMetrics: PromQL, series, alert rules"}, \
-          {name: "victorialogs", source: "./plugins/victorialogs", description: "Query VictoriaLogs with LogsQL"} \
-        ]' "$m" > /tmp/m.json \
+      | .plugins |= map(select(.name | IN("gopls-lsp", "php-lsp", "feature-dev", "context7", "playwright")))' "$m" > /tmp/m.json \
     && mv /tmp/m.json "$m" \
-    && test "$(jq '.plugins | length' "$m")" = 7 \
+    && test "$(jq '.plugins | length' "$m")" = 5 \
     && p=/opt/claudetainer-plugins/external_plugins/playwright/.mcp.json \
     && jq '.playwright.command = "playwright-mcp" | .playwright.args = []' "$p" > /tmp/p.json \
     && mv /tmp/p.json "$p" \

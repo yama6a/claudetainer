@@ -4,7 +4,7 @@
 # renovate: datasource=npm depName=@anthropic-ai/claude-code
 ARG CLAUDE_VERSION=2.1.322
 # renovate: datasource=git-refs depName=https://github.com/anthropics/claude-plugins-official branch=main
-ARG CLAUDE_PLUGINS_REF=dceb15d50832e6adf380bedc26dde03d251324b9
+ARG CLAUDE_PLUGINS_REF=43fd1f9db0941b2b83cb62268e35970d4a67c202
 # renovate: datasource=npm depName=@playwright/mcp
 ARG PLAYWRIGHT_MCP_VERSION=0.0.85
 # renovate: datasource=github-releases depName=kubernetes/kubernetes
@@ -28,7 +28,7 @@ ARG TALOSCTL_VERSION=v1.14.5
 # renovate: datasource=github-releases depName=golangci/golangci-lint
 ARG GOLANGCI_LINT_VERSION=2.15.0
 # renovate: datasource=github-tags depName=golang/go versioning=regex:^go(?<major>\d+)\.(?<minor>\d+)(\.(?<patch>\d+))?$
-ARG GO_VERSION=go1.27.3
+ARG GO_VERSION=go1.27.4
 # renovate: datasource=go depName=golang.org/x/tools/gopls
 ARG GOPLS_VERSION=v0.24.0
 # renovate: datasource=go depName=github.com/oapi-codegen/oapi-codegen/v2
@@ -50,7 +50,7 @@ ARG PGCLI_VERSION=4.7.1
 # renovate: datasource=docker depName=postgres
 ARG PG_MAJOR=18
 # renovate: datasource=github-releases depName=jdx/mise
-ARG MISE_VERSION=v2026.11.5
+ARG MISE_VERSION=v2026.11.6
 # renovate: datasource=git-refs depName=https://github.com/jdx/vfox-php branch=main
 ARG VFOX_PHP_REF=818b3ba08fb4718ece6e6382b36cdde85357cbb5
 # renovate: datasource=github-tags depName=php/php-src
@@ -80,9 +80,9 @@ ARG HADOLINT_VERSION=v2.15.1
 # renovate: datasource=pypi depName=yamllint
 ARG YAMLLINT_VERSION=1.38.0
 # renovate: datasource=npm depName=renovate
-ARG RENOVATE_VERSION=44.226.0
+ARG RENOVATE_VERSION=44.230.1
 # renovate: datasource=npm depName=prettier
-ARG PRETTIER_VERSION=3.9.10
+ARG PRETTIER_VERSION=3.10.0
 # renovate: datasource=github-releases depName=go-delve/delve
 ARG DELVE_VERSION=v1.27.2
 # renovate: datasource=github-releases depName=VictoriaMetrics/mcp-victoriametrics
@@ -91,7 +91,7 @@ ARG MCP_VICTORIAMETRICS_VERSION=v1.20.2
 ARG MCP_VICTORIALOGS_VERSION=v1.9.0
 
 # Cross-compiles on the build machine's architecture, so this stage needs no emulation.
-FROM --platform=$BUILDPLATFORM golang:1.27-alpine@sha256:fa3d596898d9f126af7c01d14ee7597bab3f39cccf392ef36b69fe77cd681f18 AS exporter
+FROM --platform=$BUILDPLATFORM golang:1.27-alpine@sha256:eb61c3873c97416fff0116553fff65d67a3549f72e11d9758849a689cdd8b523 AS exporter
 ARG TARGETOS
 ARG TARGETARCH
 WORKDIR /src

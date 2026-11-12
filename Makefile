@@ -70,6 +70,7 @@ SHELL_FILES := rootfs/usr/local/bin/claudetainer-start rootfs/usr/local/bin/clau
 
 LOGIN_IMAGE     := ghcr.io/yama6a/claudetainer:latest
 LOGIN_NAMESPACE ?= claudetainer
+LOGIN_NAME      ?= claudetainer-claude-login
 
 # The same checks as CI's shell, yaml and hadolint steps. Needs shellcheck, shfmt, hadolint, yamllint, actionlint.
 lint-image:
@@ -88,7 +89,7 @@ login:
 	docker run --rm -it --pull always -v "$(CURDIR)/login:/out" $(LOGIN_IMAGE) claudetainer-login
 
 secret:
-	kubectl create secret generic claudetainer-claude-login -n $(LOGIN_NAMESPACE) --dry-run=client -o yaml \
+	kubectl create secret generic $(LOGIN_NAME) -n $(LOGIN_NAMESPACE) --dry-run=client -o yaml \
 		--from-file=refresh-token=login/refresh-token --from-file=scopes=login/scopes > login/secret-claude-login.yaml
 
 sealed-secret: secret

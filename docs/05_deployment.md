@@ -36,6 +36,7 @@ in `chart-draft/`, which git ignores. Procedures are in [runbooks/05_deployment.
 | user | uid and gid 1000, `fsGroup` 1000, `OnRootMismatch` | a fresh Longhorn volume mounts as root. Without `OnRootMismatch`, every start chowns 100 GiB |
 | probes | none | the container exits when the server exits |
 | sidecar | `login-exporter`, 16 MiB request, 32 MiB limit, read-only root filesystem | reads the config volume read-only |
+| `CLAUDETAINER_DEFAULT_NAMESPACE` | `claudetainer-scratch` | the default namespace in each session's kubeconfig. Unset means `default` |
 | labels | `app`, `longhorn-replica-affinity/enabled` | the webhook prefers nodes that hold the volumes' replicas |
 
 ## Personal config

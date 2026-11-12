@@ -84,7 +84,7 @@ kubectl config view --minify -o jsonpath='{.contexts[0].context.namespace}'
 claude plugin list
 ```
 
-Expected: HOME under the session folder, namespace `claudetainer-scratch`, five plugins enabled, and no
+Expected: HOME under the session folder, the namespace from `CLAUDETAINER_DEFAULT_NAMESPACE`, five plugins enabled, and no
 permission prompt at any point. Then ask it to open a page with the Playwright tools.
 
 ## 13. Context7 key

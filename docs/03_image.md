@@ -56,15 +56,12 @@ there.
 
 ## Skills
 
-Skills for every session live in `rootfs/etc/claude-code/.claude/skills/`. Claude Code loads skills from
-`.claude/skills/` in the managed settings directory, which is `/etc/claude-code`.
+The image ships no skills. Skills, personal rules and facts about one cluster come from the operator's Claude
+config, `files/claude/` of the chart. The start script copies it into `~/.claude` at every start.
 
-- **Why the managed directory, not a plugin.** A skill there runs as `/skill-name` in every session with no
-  install step. A plugin would add a marketplace entry and a namespaced name for the same result.
-- **Cost:** a managed skill wins over a personal or project skill of the same name, so a user cannot override it,
-  only add one with another name.
-- **Only generic skills belong here.** The repo is public. A skill that names one person's projects goes into
-  that person's Claude config in their deployment, `files/claude/skills/` of the chart.
+- **Why not the managed directory.** Claude Code also loads skills from `/etc/claude-code/.claude/skills/`. A
+  skill there wins over a personal skill of the same name, so an operator could not replace it. Anything the
+  image ships is forced on everyone who runs it.
 
 ## Decisions
 

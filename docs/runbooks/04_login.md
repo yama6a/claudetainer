@@ -17,7 +17,8 @@ Do this for the first deploy, and again before the refresh token expires, about 
    `wrote refresh-token and scopes. The refresh token expires <date>.` Note the date.
 
 2. Seal the login with kubectl pointed at the cluster. Copy the result into the GitOps repo, then delete `login`.
-   Set `LOGIN_NAMESPACE` to seal for a namespace other than `claudetainer`:
+   Set `LOGIN_NAMESPACE` to seal for a namespace other than `claudetainer`. Set `LOGIN_NAME` to seal under a Secret
+   name other than `claudetainer-claude-login`, for a second pod. Sealed Secrets ties the result to both:
 
    ```bash
    make sealed-secret

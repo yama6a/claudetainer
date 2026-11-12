@@ -32,8 +32,8 @@ Cilium runs with `policyAuditMode: true`. Every policy below only logs a would-b
 
 ## Scratch namespace
 
-`claudetainer-scratch` is where sessions deploy experiments. The pod CLAUDE.md tells them so, and their
-kubeconfig defaults to it. Nothing enforces it: cluster-admin reaches every namespace.
+`claudetainer-scratch` is where sessions deploy experiments. The operator's Claude config tells them so. The
+chart sets `CLAUDETAINER_DEFAULT_NAMESPACE` to it, so their kubeconfig defaults to it. Nothing enforces it: cluster-admin reaches every namespace.
 
 | Limit | Value |
 |---|---|

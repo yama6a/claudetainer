@@ -8,7 +8,7 @@ built.
 | Path | Holds |
 |---|---|
 | `Dockerfile` | the image. Every pinned version is an `ARG` at the top, with a `# renovate:` line above it |
-| `rootfs/` | copied to `/` in the image: the start script, hook scripts, managed settings, the pod CLAUDE.md, skills for every session |
+| `rootfs/` | copied to `/` in the image: the start script, hook scripts, managed settings, the pod CLAUDE.md |
 | `build/` | scripts the Dockerfile runs during the build only, such as the PHP compile |
 | `cmd/login-exporter/` | the sidecar that serves the login expiry as metrics. Go, org conventions |
 | `test/smoke.sh` | checks a built image: every tool, its exact version, its path |
@@ -30,6 +30,8 @@ make smoke       # after any Dockerfile, rootfs or Go change
 
 - This repo is public and reusable by anyone. Never add facts about one cluster: hosts, namespaces, app names,
   private repo names, secrets, or skills for one setup. They belong in the operator's private GitOps repo.
+- The pod CLAUDE.md states only what the image itself sets. Personal rules, skills and cluster facts come from
+  the operator's Claude config, which the start script copies into `~/.claude`.
 - Shell: `#!/usr/bin/env bash`, `set -euo pipefail`, shfmt `-i 2 -ci -bn -sr`. Knobs in a `# ---- knobs ----`
   block with one trailing comment each.
 - ASCII only, in code and docs.
@@ -51,6 +53,5 @@ make smoke       # after any Dockerfile, rootfs or Go change
 | Session rules: sweep age, cache limits | knobs in `rootfs/usr/local/lib/claudetainer/sweep.sh` |
 | The default PHP version, PHP's `memory_limit` | `rootfs/etc/mise/config.toml`, `rootfs/etc/php/claudetainer/` |
 | claudetainer's hooks, transcript retention | `rootfs/etc/claude-code/managed-settings.json` |
-| Skills for every session, generic only | `rootfs/etc/claude-code/.claude/skills/` |
 | Pod resources, volumes, identity, scratch quota | `values.yaml` of the chart in the GitOps repo |
-| Personal Claude config | `files/claude/` of the chart in the GitOps repo |
+| Personal Claude config, skills, facts about one cluster | `files/claude/` of the chart in the GitOps repo |

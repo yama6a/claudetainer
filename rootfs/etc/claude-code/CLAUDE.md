@@ -24,15 +24,13 @@ No sudo, no apt. Put a missing tool in `~/.local/bin`, or add it to the image wi
 | Node | nvm with Node 24 and 26, npm, npx |
 | PHP | mise with PHP 8.2, 8.3, 8.4 and 8.5, Composer, Xdebug, PCOV, Intelephense |
 | Kubernetes | kubectl, helm 4, kustomize, kubeconform, kubeseal, kubectx, kubens, k9s |
-| Talos | talosctl, read-only |
+| Talos | talosctl |
 | Lint | shellcheck, shfmt, actionlint, hadolint, yamllint, prettier, renovate, renovate-config-validator |
-| Databases | psql 18, pgcli, sqlite3. A Postgres 18 server on `localhost:5432` in a sidecar container |
+| Databases | psql 18, pgcli, sqlite3 |
 | Browser | headless Chromium through the Playwright MCP server |
 | Plugins | gopls-lsp, php-lsp, feature-dev, context7, playwright |
 
 - No Docker daemon. `docker build`, `docker run` and `act` fail.
-- Postgres: `PGSANDBOX_DSN` points at the sidecar, so pgsandbox tests run here. Each test process gets databases
-  of its own. Tests that pin another Postgres major fail. The sidecar has a 1Gi memory limit.
 - Each Bash command starts in a fresh shell. Switch a runtime in the same command.
 - Node: 26 is the default. `nvm use 24 && npm test`, or `nvm exec 24 npm test`.
 - PHP: 8.5 is the default. `MISE_PHP_VERSION=8.3 composer test`, or `mise exec php@8.3 -- vendor/bin/phpunit`.
@@ -58,18 +56,8 @@ All sessions share one memory limit. When the pod reaches it, the pod restarts a
 
 ## Cluster
 
-- kubectl has cluster-admin. The default namespace is `claudetainer-scratch`.
-- Deploy experiments to `claudetainer-scratch` only. Its quota is small. Objects older than 7 days are deleted.
-- Query VictoriaMetrics and VictoriaLogs with curl from this pod, at `$VM_INSTANCE_ENTRYPOINT` and
-  `$VL_INSTANCE_ENTRYPOINT`, when the pod sets them. Never start a pod to query them.
-- Start a scratch pod only for what this pod cannot do: run a container image, or test on a node of another
-  architecture or under a memory limit. For another in-cluster service, use `kubectl port-forward` from here.
-- Delete every scratch pod you start before you finish, then check with `kubectl get pods`. A finished pod that
-  stays behind fires the pod-not-ready alert.
-- Never pipe `kubectl run --rm` into another command. If the reader exits early, kubectl dies before it deletes
-  the pod.
-- Change other namespaces only when the user asks. Pull requests to the cluster's GitOps repo manage the live
-  cluster, and Argo CD reverts manual changes.
+- kubectl uses the pod's ServiceAccount. The operator's RBAC decides what it may do.
+- The kubeconfig's default namespace comes from `CLAUDETAINER_DEFAULT_NAMESPACE`, or `default` when it is unset.
 
 ## Show files to the user
 

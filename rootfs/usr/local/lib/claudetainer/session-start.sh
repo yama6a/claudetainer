@@ -5,7 +5,6 @@ set -euo pipefail
 
 SESSIONS=/workspace/sessions
 SA=/var/run/secrets/kubernetes.io/serviceaccount
-DEFAULT_NAMESPACE=claudetainer-scratch
 
 [ -n "${CLAUDE_ENV_FILE:-}" ] || exit 0
 cwd="$(jq -r '.cwd // empty')"
@@ -34,7 +33,7 @@ contexts:
     context:
       cluster: in-cluster
       user: claudetainer
-      namespace: $DEFAULT_NAMESPACE
+      namespace: ${CLAUDETAINER_DEFAULT_NAMESPACE:-default}
 current-context: in-cluster
 EOF
   chmod 0600 "$home/.kube/config"

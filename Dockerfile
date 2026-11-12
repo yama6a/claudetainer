@@ -4,7 +4,7 @@
 # renovate: datasource=npm depName=@anthropic-ai/claude-code
 ARG CLAUDE_VERSION=2.1.322
 # renovate: datasource=git-refs depName=https://github.com/anthropics/claude-plugins-official branch=main
-ARG CLAUDE_PLUGINS_REF=43fd1f9db0941b2b83cb62268e35970d4a67c202
+ARG CLAUDE_PLUGINS_REF=e0ab6e51219eef74e417a0e1d89e5d53e5e763d4
 # renovate: datasource=npm depName=@playwright/mcp
 ARG PLAYWRIGHT_MCP_VERSION=0.0.85
 # renovate: datasource=github-releases depName=kubernetes/kubernetes
@@ -24,7 +24,7 @@ ARG KUBESEAL_VERSION=v0.41.2
 # renovate: datasource=github-releases depName=mikefarah/yq
 ARG YQ_VERSION=v4.54.3
 # renovate: datasource=github-releases depName=siderolabs/talos
-ARG TALOSCTL_VERSION=v1.14.5
+ARG TALOSCTL_VERSION=v1.14.6
 # renovate: datasource=github-releases depName=golangci/golangci-lint
 ARG GOLANGCI_LINT_VERSION=2.15.0
 # renovate: datasource=github-tags depName=golang/go versioning=regex:^go(?<major>\d+)\.(?<minor>\d+)(\.(?<patch>\d+))?$
@@ -40,9 +40,9 @@ ARG GOVULNCHECK_VERSION=v1.9.0
 # renovate: datasource=github-releases depName=nvm-sh/nvm
 ARG NVM_VERSION=v0.41.0
 # renovate: datasource=github-tags depName=nodejs/node
-ARG NODE24_VERSION=v24.22.2
+ARG NODE24_VERSION=v24.22.3
 # renovate: datasource=github-tags depName=nodejs/node
-ARG NODE26_VERSION=v26.13.0
+ARG NODE26_VERSION=v26.13.1
 # renovate: datasource=npm depName=npm
 ARG NPM_VERSION=11.21.2
 # renovate: datasource=pypi depName=pgcli
@@ -50,7 +50,7 @@ ARG PGCLI_VERSION=4.7.1
 # renovate: datasource=docker depName=postgres
 ARG PG_MAJOR=18
 # renovate: datasource=github-releases depName=jdx/mise
-ARG MISE_VERSION=v2026.11.6
+ARG MISE_VERSION=v2026.11.7
 # renovate: datasource=git-refs depName=https://github.com/jdx/vfox-php branch=main
 ARG VFOX_PHP_REF=818b3ba08fb4718ece6e6382b36cdde85357cbb5
 # renovate: datasource=github-tags depName=php/php-src
@@ -80,9 +80,9 @@ ARG HADOLINT_VERSION=v2.15.1
 # renovate: datasource=pypi depName=yamllint
 ARG YAMLLINT_VERSION=1.38.0
 # renovate: datasource=npm depName=renovate
-ARG RENOVATE_VERSION=44.230.1
+ARG RENOVATE_VERSION=44.235.5
 # renovate: datasource=npm depName=prettier
-ARG PRETTIER_VERSION=3.10.0
+ARG PRETTIER_VERSION=3.10.1
 # renovate: datasource=github-releases depName=go-delve/delve
 ARG DELVE_VERSION=v1.27.2
 

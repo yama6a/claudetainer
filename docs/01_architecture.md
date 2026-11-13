@@ -31,8 +31,12 @@ Session handling is in [02_sessions.md](02_sessions.md), the image in [03_image.
 
 `claude remote-control` started again in the same folder, with the same config, takes back every session it
 served. It starts a session's process only when claude.ai sends that session something: you open it, or a
-message arrives. This works for about 4 hours after the server stopped, as long as `~/.claude` and `/workspace`
-survive the restart. Both are Longhorn volumes.
+message arrives. This works as long as `~/.claude` and `/workspace` survive the restart. Both are Longhorn volumes.
+
+The server finds its claude.ai environment again through `bridge-pointer.json` in `~/.claude`. Claude Code ignores
+that file once it is older than 4 hours and registers a new environment. Sessions of the old environment then stay
+offline. The start script touches the file before the server starts, so the 4-hour limit never applies. claude.ai
+may still expire an environment on its side after a longer outage. Its limit is not known.
 
 A session that was busy at the stop gets a wake message, see [02_sessions.md](02_sessions.md). Busy means a
 turn or a background task was running. Claude Code then resumes the cut-off turn and restarts the lost
@@ -43,7 +47,7 @@ background tasks itself.
 | A deploy, a Reloader restart, a node drain | busy sessions resume within a minute. The others resume when you open them |
 | The container is killed, for example out of memory | the same, from the status files of the killed processes |
 | The server exits after about 10 minutes without network | Kubernetes restarts the container. Sessions resume when you open them |
-| The pod stays down longer than about 4 hours | its sessions stay archived. Start new ones. The old folders stay until the sweep |
+| The pod stays down for many hours | the same, as long as claude.ai keeps the environment |
 
 ## Decisions
 

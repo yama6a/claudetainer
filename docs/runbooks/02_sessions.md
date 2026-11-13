@@ -60,8 +60,9 @@ sessions continue within a minute. The others answer when you open them.
 
 ## A session is gone after a long outage
 
-The server brings sessions back for about 4 hours after it stopped. After that, start a new session. Its folder
-and transcript stay on disk until the sweep. Point the new session at the old folder to continue the work.
+The server brings sessions back as long as claude.ai keeps its environment. When the server logs a new
+environment URL after the outage, the old sessions stay offline. Start a new session then. Its folder and transcript
+stay on disk until the sweep. Point the new session at the old folder to continue the work.
 
 ## Resume a scheduled session by hand
 

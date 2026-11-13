@@ -87,6 +87,13 @@ login() {
     || die "no claude.ai login. Seal a new refresh token, see docs/runbooks/04_login.md"
 }
 
+# claude rc reuses the environment named in its pointer only if the file changed in the last 4 hours.
+# The minute back keeps wake.sh from taking the touch for the server's registration.
+keep_environment() {
+  local pointer="$CLAUDE_CONFIG_DIR/projects/-workspace-sessions-home/bridge-pointer.json"
+  if [ -f "$pointer" ]; then touch -d '1 minute ago' "$pointer"; fi
+}
+
 install_plugins() {
   local p
   claude plugin marketplace add "$MARKETPLACE_DIR" > /dev/null 2>&1 \
@@ -105,6 +112,7 @@ write_git_config
 write_gh_config
 login
 install_plugins
+keep_environment
 /usr/local/lib/claudetainer/bg-sessions.sh resume || log "resuming scheduled sessions failed"
 /usr/local/lib/claudetainer/wake.sh run &
 

@@ -1,5 +1,6 @@
 {
   "cleanupPeriodDays": 365,
+  "crossSessionInbound": "accept",
   "hooks": {
     "WorktreeCreate": [
       {

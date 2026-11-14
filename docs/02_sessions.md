@@ -33,6 +33,17 @@ the hooks in your personal settings.
 The env file reaches Bash commands only. Hooks, gopls and MCP servers keep `HOME=/home/agent`. So the cache
 locations are set in the container environment, not per session.
 
+## Messages between sessions
+
+A peer message is a message that another session or a script sends to a session, not the owner. Examples are
+SendMessage from another session and the alert updates that the alerts-triage gate script posts.
+
+The managed settings set `crossSessionInbound` to `accept`, so every session reads peer messages at once. The
+session sees each one marked as sent by another session, not by the owner.
+
+Every session here bypasses permission prompts. Without the setting, Claude Code holds each peer message in such a
+session for the owner's approval. A message that nobody approves expires unread.
+
 ## Scheduled sessions
 
 A scheduled session is a session that starts on a cron schedule with a fixed prompt. You read and answer it in

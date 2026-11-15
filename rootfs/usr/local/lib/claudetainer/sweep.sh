@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Frees /workspace: folders of archived or deleted sessions, stale folders that belong to no session, and the
-# cache. The chart's sweep CronJob calls it through kubectl exec once a day. The sweep-cache CronJob calls
-# `sweep.sh cache` every hour, which does only the cache part.
+# Frees /workspace: folders of archived or deleted sessions with their Claude Code temp folders, stale folders
+# that belong to no session, and the cache. The chart's sweep CronJob calls it through kubectl exec once a day.
+# The sweep-cache CronJob calls `sweep.sh cache` every hour, which does only the cache part.
 set -euo pipefail
 shopt -s nullglob
 
@@ -13,6 +13,7 @@ GO_BUILD_IDLE_HOURS="${CLAUDETAINER_GO_BUILD_IDLE_HOURS:-6}" # hours. Go build c
 
 SESSIONS=/workspace/sessions
 CACHE=/workspace/.cache
+TMP="${CLAUDE_CODE_TMPDIR:?}/claude-$(id -u)"
 
 log() { printf 'sweep: %s\n' "$*" >&2; }
 
@@ -57,6 +58,38 @@ remove_if_stale() {
   fi
 }
 
+# Claude Code names a temp folder after the session's working directory, with each character but a letter or digit
+# turned into "-". A working directory below a session folder adds "-" and the rest to that folder's name.
+owned_by() {
+  local folder="${2//[^a-zA-Z0-9]/-}"
+  [ "$1" = "$folder" ] || [[ "$1" == "$folder"-* ]]
+}
+
+# A temp folder of a live session stays. One of a session removed in this run goes with it. Any other goes per
+# session subfolder once stale, like the home session's subfolders.
+prune_tmp() {
+  local t name dir state sub
+  for t in "$TMP"/*/; do
+    t="${t%/}"
+    name="${t##*/}"
+    state=stale
+    for dir in "$SESSIONS"/*/; do
+      dir="${dir%/}"
+      if [ "${dir##*/}" != home ] && owned_by "$name" "$dir"; then state=live; fi
+    done
+    for dir in "${removed[@]}"; do
+      if [ "$state" = stale ] && owned_by "$name" "$dir"; then state=removed; fi
+    done
+    case "$state" in
+      removed)
+        remove "$t"
+        log "temp folder $name: session folder removed, removed"
+        ;;
+      stale) for sub in "$t"/*; do remove_if_stale "$sub"; done ;;
+    esac
+  done
+}
+
 load_token || log "no valid access token, keeping every session folder"
 
 # A scheduled session's folder name holds no session ID. Claude Code's job record links the folder to it.
@@ -68,6 +101,7 @@ for state in "$CONFIG"/jobs/*/state.json; do
 done
 
 declare -A statuses
+removed=()
 found=0
 for dir in "$SESSIONS"/*/; do
   dir="${dir%/}"
@@ -91,6 +125,7 @@ for dir in "${!statuses[@]}"; do
   status="${statuses[$dir]}"
   if [ "$status" = archived ] || { [ "$status" = deleted ] && [ "$found" = 1 ]; }; then
     remove "$dir"
+    removed+=("$dir")
     log "${dir##*/}: $status, removed"
   elif [ "$status" != active ]; then
     log "${dir##*/}: $status, kept"
@@ -99,5 +134,6 @@ done
 
 shopt -s dotglob
 for sub in "$SESSIONS"/home/*; do remove_if_stale "$sub"; done
+prune_tmp
 
 prune_cache

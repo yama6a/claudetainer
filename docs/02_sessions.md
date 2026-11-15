@@ -14,6 +14,8 @@ in [runbooks/02_sessions.md](runbooks/02_sessions.md).
 | any other folder in `/workspace/sessions/` | belongs to no session | the sweep, 30 days after the newest file changed |
 | `<session folder>/.home/` | that session's HOME: GOPATH, `~/.local`, its kubeconfig | with its folder |
 | `/workspace/.cache/` | Go module and build caches, npm, uv, Composer and mise caches, `XDG_CACHE_HOME`, shared | the sweep, whole, above the cache limit |
+| `/workspace/.tmp/` | Claude Code's temp folder, `CLAUDE_CODE_TMPDIR`: scratchpads and background-command output, one folder per working directory | the sweep, with its session folder. Any other folder per session, 30 days after its newest file changed |
+| `/run/user/1000/` | `XDG_RUNTIME_DIR`: the sockets for messages between sessions | the next pod restart |
 | `/opt/nvm/` | Node 24 and 26, and whatever `npm install -g` adds | the next pod restart |
 | `/opt/mise/` | PHP 8.2 to 8.5, and whatever `mise install` adds | the next pod restart |
 | `~/.claude/projects/` | transcripts, one folder per session folder | Claude Code, after 365 days |
@@ -137,6 +139,16 @@ Background sessions run under Claude Code's own supervisor process inside the po
 - **Cache limits per pod.** The defaults fit a cache that shares the workspace volume. A pod whose
   `/workspace/.cache` is a disk of its own sets `CLAUDETAINER_CACHE_LIMIT_GIB` and
   `CLAUDETAINER_GO_BUILD_IDLE_HOURS` to keep caches longer.
+- **Claude Code's temp folder on the workspace volume.** A session that resumes after a restart can still read
+  the output of a background command that the restart cut off, and its scratchpad. A resumed session keeps its
+  session ID, so the paths in its transcript stay valid. Cost: every background command's output goes through
+  Longhorn replication. Bash commands keep `TMPDIR` unset, so build and test temp files stay in `/tmp`.
+- **Sockets in `XDG_RUNTIME_DIR`.** Claude Code puts its sockets in `XDG_RUNTIME_DIR` when it is set, else in
+  `CLAUDE_CODE_TMPDIR`. `/run/user/1000` is in the image, so a restart empties it and leaves no stale sockets.
+- **Temp folders follow session folders by name.** Claude Code names a temp folder after the working directory,
+  with each character but a letter or digit turned into `-`. A session folder's name can be the start of another
+  one's, such as `scheduled-x` and `scheduled-x-2`. The sweep then keeps the longer one's temp folder while the
+  shorter one's session folder exists.
 - **nvm writable and shared.** nvm refuses to switch Node while an npm prefix outside its folder is set, so there
   is no per-session npm prefix. `npm install -g` and `nvm install` write into `/opt/nvm`, shared by every session
   and lost on restart.

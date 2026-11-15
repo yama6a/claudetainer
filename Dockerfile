@@ -101,7 +101,7 @@ FROM docker/sandbox-templates:claude-code-minimal-0.10.0@sha256:e82cbbef8a57af65
 ARG TARGETARCH
 # The build stages run as root. The final stage switches to agent at its end.
 # hadolint ignore=DL3002
-USER root
+USER 0
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -385,7 +385,7 @@ ENV LANG=C.UTF-8 \
     PLAYWRIGHT_MCP_NO_SANDBOX=true \
     PLAYWRIGHT_MCP_USER_DATA_DIR=/home/agent/.claude/playwright-profile
 
-USER agent
+USER 1000
 WORKDIR /workspace
 ENTRYPOINT ["tini", "--"]
 CMD ["claudetainer-start"]

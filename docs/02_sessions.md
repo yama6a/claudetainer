@@ -13,7 +13,7 @@ in [runbooks/02_sessions.md](runbooks/02_sessions.md).
 | `/workspace/sessions/scheduled-<name>-<time>/` | one scheduled session: its clones | the sweep, once claude.ai reports the session archived or deleted |
 | any other folder in `/workspace/sessions/` | belongs to no session | the sweep, 30 days after the newest file changed |
 | `<session folder>/.home/` | that session's HOME: GOPATH, `~/.local`, its kubeconfig | with its folder |
-| `/workspace/.cache/` | Go module and build caches, npm, uv, Composer and mise caches, shared | the sweep, whole, above 20 GiB |
+| `/workspace/.cache/` | Go module and build caches, npm, uv, Composer and mise caches, shared | the sweep, whole, above the cache limit |
 | `/opt/nvm/` | Node 24 and 26, and whatever `npm install -g` adds | the next pod restart |
 | `/opt/mise/` | PHP 8.2 to 8.5, and whatever `mise install` adds | the next pod restart |
 | `~/.claude/projects/` | transcripts, one folder per session folder | Claude Code, after 365 days |
@@ -127,10 +127,14 @@ Background sessions run under Claude Code's own supervisor process inside the po
 - **No sudo, HOME per session.** Tools that install into HOME stay inside one session and vanish with its folder.
   Anything that needs root must go into the image.
 - **Shared download caches.** Go, npm and uv caches are content-addressed and safe for parallel use. Cost: a
-  session can poison an entry the others then read. The sweep wipes the cache whole above 20 GiB.
+  session can poison an entry the others then read. The sweep wipes the cache whole above the cache limit.
 - **Hourly Go build cache prune.** Go's own trim keeps entries for 5 days. A busy day of Go work adds over 30 GiB
   in 12 hours, faster than the daily sweep catches. So `sweep.sh cache` runs every hour. It deletes Go build
-  entries unused for 6 hours, then applies the 20 GiB limit. Cost: a session idle for 6 hours rebuilds from scratch.
+  entries unused for 6 hours, then applies the 20 GiB cache limit. Cost: a session idle for 6 hours rebuilds from
+  scratch.
+- **Cache limits per pod.** The defaults fit a cache that shares the workspace volume. A pod whose
+  `/workspace/.cache` is a disk of its own sets `CLAUDETAINER_CACHE_LIMIT_GIB` and
+  `CLAUDETAINER_GO_BUILD_IDLE_HOURS` to keep caches longer.
 - **nvm writable and shared.** nvm refuses to switch Node while an npm prefix outside its folder is set, so there
   is no per-session npm prefix. `npm install -g` and `nvm install` write into `/opt/nvm`, shared by every session
   and lost on restart.

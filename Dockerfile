@@ -379,6 +379,7 @@ ENV LANG=C.UTF-8 \
     COMPOSER_MEMORY_LIMIT=1G \
     PHP_INI_SCAN_DIR=:/etc/php/claudetainer \
     UV_CACHE_DIR=/workspace/.cache/uv \
+    XDG_CACHE_HOME=/workspace/.cache/xdg \
     PLAYWRIGHT_MCP_BROWSER=chromium \
     PLAYWRIGHT_MCP_HEADLESS=true \
     PLAYWRIGHT_MCP_NO_SANDBOX=true \

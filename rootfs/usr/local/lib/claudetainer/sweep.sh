@@ -6,9 +6,10 @@ set -euo pipefail
 shopt -s nullglob
 
 # ---- knobs ----
-STALE_DAYS=30         # days without a file change before a folder that belongs to no session goes
-CACHE_LIMIT_GIB=20    # /workspace/.cache is wiped whole above this
-GO_BUILD_IDLE_HOURS=6 # Go build cache entries unused for this long are deleted
+STALE_DAYS=30 # days without a file change before a folder that belongs to no session goes
+# The two cache knobs take a per-pod override from the env, because the cache can sit on a much larger disk.
+CACHE_LIMIT_GIB="${CLAUDETAINER_CACHE_LIMIT_GIB:-20}"        # GiB. /workspace/.cache is wiped whole above this
+GO_BUILD_IDLE_HOURS="${CLAUDETAINER_GO_BUILD_IDLE_HOURS:-6}" # hours. Go build cache entries unused for this long are deleted
 
 SESSIONS=/workspace/sessions
 CACHE=/workspace/.cache

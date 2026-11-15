@@ -8,6 +8,8 @@ This session runs in a Kubernetes pod. Other Claude Code sessions run in the sam
 - Never read or change another session's folder.
 - The folder is deleted 30 days after the session's last message. Push work to GitHub early.
 - `HOME` is `.home` inside your folder. `go install`, `uv tool install` and `~/.local/bin` stay yours.
+- Claude Code keeps your scratchpad and the output of background commands in `/workspace/.tmp`. Both survive a
+  pod restart. `/tmp` does not.
 - `/workspace/.cache` holds the shared caches for Go, npm, uv, Composer and mise. `XDG_CACHE_HOME` points into it,
   so tools such as golangci-lint and gopls share theirs too.
 

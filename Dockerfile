@@ -360,16 +360,21 @@ COPY rootfs/ /
 COPY --from=exporter /login-exporter /usr/local/bin/login-exporter
 RUN chmod 0755 /usr/local/bin/claudetainer-start /usr/local/bin/claudetainer-login /usr/local/bin/uvx /usr/local/lib/claudetainer/*.sh \
     && mkdir -p /workspace \
-    && chown agent:agent /workspace /home/agent
+    && chown agent:agent /workspace /home/agent \
+    && install -d -m 0700 -o agent -g agent /run/user/1000
 
 # Empty values override the base image's, which pointed at the removed shared files. The start script
 # unsets them entirely before Claude starts.
+# CLAUDE_CODE_TMPDIR keeps scratchpads and background-command output across restarts. Claude Code would put its
+# sockets there too, but it prefers XDG_RUNTIME_DIR, which a restart empties like /tmp.
 ENV LANG=C.UTF-8 \
     BASH_ENV= \
     CLAUDE_ENV_FILE= \
     NPM_CONFIG_PREFIX= \
     DISABLE_AUTOUPDATER=1 \
     CLAUDE_CONFIG_DIR=/home/agent/.claude \
+    CLAUDE_CODE_TMPDIR=/workspace/.tmp \
+    XDG_RUNTIME_DIR=/run/user/1000 \
     GH_CONFIG_DIR=/home/agent/.config/gh \
     GIT_CONFIG_GLOBAL=/home/agent/.gitconfig \
     GOMODCACHE=/workspace/.cache/go-mod \

@@ -2,9 +2,9 @@
 
 # Global scope. Redeclare each ARG bare above the RUN that uses it, so a bump rebuilds from there down.
 # renovate: datasource=npm depName=@anthropic-ai/claude-code
-ARG CLAUDE_VERSION=2.1.325
+ARG CLAUDE_VERSION=2.1.326
 # renovate: datasource=git-refs depName=https://github.com/anthropics/claude-plugins-official branch=main
-ARG CLAUDE_PLUGINS_REF=b5b01ac4f889fec0c4c6bb89f27ca7c8574473f6
+ARG CLAUDE_PLUGINS_REF=fd30cee3ecd5a8ee772733c5d20c0f2bae2da2f0
 # renovate: datasource=npm depName=@playwright/mcp
 ARG PLAYWRIGHT_MCP_VERSION=0.0.85
 # renovate: datasource=github-releases depName=kubernetes/kubernetes
@@ -50,7 +50,7 @@ ARG PGCLI_VERSION=4.7.1
 # renovate: datasource=docker depName=postgres
 ARG PG_MAJOR=18
 # renovate: datasource=github-releases depName=jdx/mise
-ARG MISE_VERSION=v2026.11.8
+ARG MISE_VERSION=v2026.11.9
 # renovate: datasource=git-refs depName=https://github.com/jdx/vfox-php branch=main
 ARG VFOX_PHP_REF=818b3ba08fb4718ece6e6382b36cdde85357cbb5
 # renovate: datasource=github-tags depName=php/php-src
@@ -80,14 +80,14 @@ ARG HADOLINT_VERSION=v2.15.1
 # renovate: datasource=pypi depName=yamllint
 ARG YAMLLINT_VERSION=1.38.0
 # renovate: datasource=npm depName=renovate
-ARG RENOVATE_VERSION=44.241.0
+ARG RENOVATE_VERSION=44.247.2
 # renovate: datasource=npm depName=prettier
 ARG PRETTIER_VERSION=3.10.1
 # renovate: datasource=github-releases depName=go-delve/delve
 ARG DELVE_VERSION=v1.27.2
 
 # Cross-compiles on the build machine's architecture, so this stage needs no emulation.
-FROM --platform=$BUILDPLATFORM golang:1.27-alpine@sha256:eb61c3873c97416fff0116553fff65d67a3549f72e11d9758849a689cdd8b523 AS exporter
+FROM --platform=$BUILDPLATFORM golang:1.27-alpine@sha256:70bd7ddea8b6cbe5d6943cde279d6b67feb10cc924fb9100d1d8757c1575b280 AS exporter
 ARG TARGETOS
 ARG TARGETARCH
 WORKDIR /src

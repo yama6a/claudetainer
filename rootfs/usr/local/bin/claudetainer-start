@@ -51,6 +51,22 @@ seed_claude_json() {
   mv "$tmp" "$f"
 }
 
+# The personal-config ConfigMap owns all user-level MCP servers. A server added by hand goes at the next start.
+sync_mcp_servers() {
+  local f="$CLAUDE_CONFIG_DIR/.claude.json" src="$USER_CONFIG/mcp-servers.json" tmp
+  tmp="$(mktemp)"
+  if [ -f "$src" ]; then
+    jq --slurpfile s "$src" '.mcpServers = $s[0]' "$f" > "$tmp" || {
+      log "invalid $src, MCP servers unchanged"
+      rm -f "$tmp"
+      return
+    }
+  else
+    jq '.mcpServers = {}' "$f" > "$tmp"
+  fi
+  mv "$tmp" "$f"
+}
+
 # git-guard.sh blocks any commit unless the global config signs it, so signing is not optional here.
 write_git_config() {
   install -m 0600 "$SECRETS/signing-key/id_ed25519" "$HOME/.ssh/signing_key"
@@ -108,6 +124,7 @@ install_plugins() {
 
 sync_user_config
 seed_claude_json
+sync_mcp_servers
 write_git_config
 write_gh_config
 login

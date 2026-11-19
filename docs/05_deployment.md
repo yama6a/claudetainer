@@ -45,6 +45,11 @@ The ConfigMap holds your CLAUDE.md, rules, the Terse output style, the skills co
 variant of git-commit, the dry-up-code command, the hooks git-guard.sh and no-slop-chars.sh, and settings.json.
 The start script copies them into `~/.claude` at every start and deletes files dropped from the ConfigMap.
 
+The ConfigMap can also hold `mcp-servers.json`. The file is optional. Its top-level object maps server names to
+Claude Code MCP server configs. At every start the script replaces `mcpServers` in `.claude.json` with that object.
+Without the file, `mcpServers` becomes empty. If the file is not valid JSON, the script logs it and keeps the old
+`mcpServers`. The ConfigMap cannot ship `.claude.json` itself, because that file also holds the login.
+
 The pod's settings.json is your laptop's minus the Nordnet marketplace, plugins and paths, minus the `ask`
 rules, plus `inputNeededNotifEnabled: true`. Its plugin names point at `claudetainer-plugins`.
 

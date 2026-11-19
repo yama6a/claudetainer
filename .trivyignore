@@ -1,6 +1,7 @@
 # Findings that Trivy reports in the image and that no Dockerfile change can fix.
 # Each group names the file or package that carries the finding. Remove a group when its version bump clears it.
 # CI fails on any HIGH or CRITICAL finding with a fix that is not listed here.
+# For a Go standard library CVE, `go version <path to binary>` in the image prints the Go that built the binary.
 
 # Prebuilt actionlint v1.7.12: upstream release built with an older Go or older modules, so it carries findings in the Go standard library of Go 1.26.1
 CVE-2026-111943
@@ -27,18 +28,21 @@ CVE-2026-56862
 CVE-2026-78667
 CVE-2026-78669
 CVE-2026-97031
+CVE-2026-97054  # Go standard library, remove once this binary is built with Go 1.26.11, 1.27.4 or later
 
 # Prebuilt dlv v1.27.2: upstream release built with an older Go or older modules, so it carries findings in the Go standard library of Go 1.27.1
 CVE-2026-111943
 CVE-2026-78667
 CVE-2026-78669
 CVE-2026-97031
+CVE-2026-97054  # Go standard library, remove once this binary is built with Go 1.26.11, 1.27.4 or later
 
 # Prebuilt golangci-lint v2.15.0: upstream release built with an older Go or older modules, so it carries findings in the Go standard library of Go 1.27.0
 CVE-2026-111943
 CVE-2026-78667
 CVE-2026-78669
 CVE-2026-97031
+CVE-2026-97054  # Go standard library, remove once this binary is built with Go 1.26.11, 1.27.4 or later
 
 # Prebuilt helm v4.3.1: upstream release built with an older Go or older modules, so it carries findings in the Go standard library of Go 1.27.2 and Go modules golang.org/x/net
 CVE-2026-78661  # golang.org/x/net v0.60.0
@@ -99,6 +103,7 @@ CVE-2026-56860
 CVE-2026-56862
 CVE-2026-78667
 CVE-2026-97031
+CVE-2026-97054  # Go standard library, remove once this binary is built with Go 1.26.11, 1.27.4 or later
 
 # Prebuilt kubeconform v0.8.0: upstream release built with an older Go or older modules, so it carries findings in the Go standard library of Go 1.26.3 and Go modules golang.org/x/text
 CVE-2026-56851  # golang.org/x/text v0.37.0
@@ -118,11 +123,13 @@ CVE-2026-56862
 CVE-2026-78667
 CVE-2026-78669
 CVE-2026-97031
+CVE-2026-97054  # Go standard library, remove once this binary is built with Go 1.26.11, 1.27.4 or later
 
-# Prebuilt kubectl v1.37.2: upstream release built with an older Go or older modules, so it carries findings in the Go modules golang.org/x/net, golang.org/x/text
+# Prebuilt kubectl v1.37.2: upstream release built with an older Go or older modules, so it carries findings in the Go standard library of Go 1.26.10 and Go modules golang.org/x/net, golang.org/x/text
 CVE-2026-78661  # golang.org/x/net v0.57.0
 CVE-2026-78669  # golang.org/x/net v0.57.0
 CVE-2026-56851  # golang.org/x/text v0.40.0
+CVE-2026-97054  # Go standard library, remove once this binary is built with Go 1.26.11, 1.27.4 or later
 
 # Prebuilt kubectx v0.11.0: upstream release built with an older Go or older modules, so it carries findings in the Go standard library of Go 1.25.8 and Go modules golang.org/x/net, golang.org/x/text
 CVE-2026-25681  # golang.org/x/net v0.47.0
@@ -153,6 +160,7 @@ CVE-2026-56860
 CVE-2026-56862
 CVE-2026-78667
 CVE-2026-97031
+CVE-2026-97054  # Go standard library, remove once this binary is built with Go 1.26.11, 1.27.4 or later
 
 # Prebuilt kubens v0.11.0: upstream release built with an older Go or older modules, so it carries findings in the Go standard library of Go 1.25.8 and Go modules golang.org/x/net, golang.org/x/text
 CVE-2026-25681  # golang.org/x/net v0.47.0
@@ -183,15 +191,18 @@ CVE-2026-56860
 CVE-2026-56862
 CVE-2026-78667
 CVE-2026-97031
+CVE-2026-97054  # Go standard library, remove once this binary is built with Go 1.26.11, 1.27.4 or later
 
-# Prebuilt kubeseal v0.41.2: upstream release built with an older Go or older modules, so it carries findings in the Go modules golang.org/x/net
+# Prebuilt kubeseal v0.41.2: upstream release built with an older Go or older modules, so it carries findings in the Go standard library of Go 1.27.3 and Go modules golang.org/x/net
 CVE-2026-78661  # golang.org/x/net v0.60.0
+CVE-2026-97054  # Go standard library, remove once this binary is built with Go 1.26.11, 1.27.4 or later
 
 # Prebuilt kustomize v5.8.3: upstream release built with an older Go or older modules, so it carries findings in the Go standard library of Go 1.27.1
 CVE-2026-111943
 CVE-2026-78667
 CVE-2026-78669
 CVE-2026-97031
+CVE-2026-97054  # Go standard library, remove once this binary is built with Go 1.26.11, 1.27.4 or later
 
 # Prebuilt oapi-codegen v2.8.2: upstream release built with an older Go or older modules, so it carries findings in the Go modules github.com/getkin/kin-openapi, golang.org/x/mod, golang.org/x/text
 CVE-2026-100349  # github.com/getkin/kin-openapi v0.142.0
@@ -209,27 +220,41 @@ CVE-2026-111943
 CVE-2026-78667
 CVE-2026-78669
 CVE-2026-97031
+CVE-2026-97054  # Go standard library, remove once this binary is built with Go 1.26.11, 1.27.4 or later
 
 # Prebuilt talosctl v1.14.5: upstream release built with an older Go or older modules, so it carries findings in the Go modules golang.org/x/net
 CVE-2026-78661  # golang.org/x/net v0.61.0
 
+# Prebuilt yq v4.54.3: upstream release built with an older Go or older modules, so it carries findings in the Go standard library of Go 1.27.3
+CVE-2026-97054  # Go standard library, remove once this binary is built with Go 1.26.11, 1.27.4 or later
+
 # gh from the docker/sandbox-templates base image, a prebuilt Go binary at /usr/bin/gh
 CVE-2026-78661  # golang.org/x/net v0.60.0
+CVE-2026-97054  # Go standard library, remove once this binary is built with Go 1.26.11, 1.27.4 or later
 
 # pebble from the docker/sandbox-templates base image, a prebuilt Go binary at /usr/bin/pebble
 CVE-2026-111943
 CVE-2026-78667
 CVE-2026-78669
 CVE-2026-97031
+CVE-2026-97054  # Go standard library, remove once this binary is built with Go 1.26.11, 1.27.4 or later
+
+# docker from the docker/sandbox-templates base image, a prebuilt Go binary at /usr/bin/docker
+CVE-2026-97054  # Go standard library, remove once this binary is built with Go 1.26.11, 1.27.4 or later
+
+# clipboard-bridge from the docker/sandbox-templates base image, a prebuilt Go binary at /usr/local/bin/clipboard-bridge
+CVE-2026-97054  # Go standard library, remove once this binary is built with Go 1.26.11, 1.27.4 or later
 
 # docker-buildx from the docker/sandbox-templates base image, a prebuilt Go binary at /usr/libexec/docker/cli-plugins/docker-buildx
 CVE-2026-17106  # github.com/moby/go-archive v0.2.0
 CVE-2026-78661  # golang.org/x/net v0.59.0
 CVE-2026-78669  # golang.org/x/net v0.59.0
+CVE-2026-97054  # Go standard library, remove once this binary is built with Go 1.26.11, 1.27.4 or later
 
 # docker-compose from the docker/sandbox-templates base image, a prebuilt Go binary at /usr/libexec/docker/cli-plugins/docker-compose
 CVE-2026-78661  # golang.org/x/net v0.58.0
 CVE-2026-78669  # golang.org/x/net v0.58.0
+CVE-2026-97054  # Go standard library, remove once this binary is built with Go 1.26.11, 1.27.4 or later
 
 # Intelephense 1.18.5 bundles these npm dependencies, and the newest Intelephense still carries them
 CVE-2026-102990  # basic-ftp 5.3.1

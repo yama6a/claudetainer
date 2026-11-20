@@ -112,7 +112,7 @@ Required checks: `go / go`, `shell`, `yaml`, `renovate-config`, `build-amd64`, `
 
 ## Known vulnerabilities
 
-The release build scans the image with Trivy and fails on a HIGH or CRITICAL finding that has a fixed version.
+`image-scan.yaml` scans the released image with Trivy after the build. It fails on a HIGH or CRITICAL finding that has a fixed version and alerts. It does not block the release or the deploy.
 `.trivyignore` at the repo root lists the findings that a Dockerfile change cannot fix. They sit in prebuilt Go
 tools that upstream built with an older Go, in the docker CLI plugins of the base image, and in Intelephense's npm
-dependencies. A new finding still fails the build. When a tool bump clears a finding, delete its line.
+dependencies. A new finding still fails the scan. When a tool bump clears a finding, delete its line.

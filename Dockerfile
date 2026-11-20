@@ -48,7 +48,7 @@ ARG NPM_VERSION=11.21.3
 # renovate: datasource=pypi depName=pgcli
 ARG PGCLI_VERSION=4.7.1
 # renovate: datasource=docker depName=postgres
-ARG PG_MAJOR=18
+ARG PG_MAJOR=19
 # renovate: datasource=github-releases depName=jdx/mise
 ARG MISE_VERSION=v2026.11.10
 # renovate: datasource=git-refs depName=https://github.com/jdx/vfox-php branch=main

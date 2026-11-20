@@ -53,6 +53,7 @@ CVE-2026-53488  # github.com/containerd/containerd v1.7.32
 CVE-2026-53489  # github.com/containerd/containerd/v2 v2.2.4
 CVE-2026-53492  # github.com/containerd/containerd/v2 v2.2.4
 CVE-2026-95837  # github.com/containerd/containerd/v2 v2.2.4
+CVE-2026-95839  # github.com/containerd/containerd/v2 v2.2.4
 CVE-2026-71556  # github.com/go-git/go-git/v5 v5.19.1
 CVE-2026-116587  # github.com/go-jose/go-jose/v4 v4.1.4
 CVE-2026-63209  # github.com/klauspost/compress v1.18.5
@@ -246,12 +247,14 @@ CVE-2026-97054  # Go standard library, remove once this binary is built with Go 
 CVE-2026-97054  # Go standard library, remove once this binary is built with Go 1.26.11, 1.27.4 or later
 
 # docker-buildx from the docker/sandbox-templates base image, a prebuilt Go binary at /usr/libexec/docker/cli-plugins/docker-buildx
+CVE-2026-95839  # github.com/containerd/containerd/v2 v2.4.1
 CVE-2026-17106  # github.com/moby/go-archive v0.2.0
 CVE-2026-78661  # golang.org/x/net v0.59.0
 CVE-2026-78669  # golang.org/x/net v0.59.0
 CVE-2026-97054  # Go standard library, remove once this binary is built with Go 1.26.11, 1.27.4 or later
 
 # docker-compose from the docker/sandbox-templates base image, a prebuilt Go binary at /usr/libexec/docker/cli-plugins/docker-compose
+CVE-2026-95839  # github.com/containerd/containerd/v2 v2.4.1
 CVE-2026-78661  # golang.org/x/net v0.58.0
 CVE-2026-78669  # golang.org/x/net v0.58.0
 CVE-2026-97054  # Go standard library, remove once this binary is built with Go 1.26.11, 1.27.4 or later

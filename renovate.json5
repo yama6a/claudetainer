@@ -93,5 +93,13 @@
       matchCurrentValue: "/^8\\.5\\./",
       allowedVersions: "/^8\\.5\\./",
     },
+    {
+      // Renovate's mise manager reads rootfs/etc/mise/config.toml. Its default PHP must be a minor the
+      // image builds, so it moves only by hand, together with a new build stage.
+      description: "the mise default PHP stays on 8.5",
+      matchManagers: ["mise"],
+      matchDepNames: ["php"],
+      allowedVersions: "<8.6",
+    },
   ],
 }

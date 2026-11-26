@@ -4,11 +4,11 @@
 # renovate: datasource=npm depName=@anthropic-ai/claude-code
 ARG CLAUDE_VERSION=2.1.332
 # renovate: datasource=git-refs depName=https://github.com/anthropics/claude-plugins-official branch=main
-ARG CLAUDE_PLUGINS_REF=6985b2d88dc08b4a0d202f5f0301f02e360b9cb1
+ARG CLAUDE_PLUGINS_REF=0fbfda5a91f4adc311daca25acc99132f40f0b6e
 # renovate: datasource=npm depName=@playwright/mcp
 ARG PLAYWRIGHT_MCP_VERSION=0.0.86
 # renovate: datasource=github-releases depName=kubernetes/kubernetes
-ARG KUBECTL_VERSION=v1.37.2
+ARG KUBECTL_VERSION=v1.37.3
 # renovate: datasource=github-releases depName=helm/helm
 ARG HELM_VERSION=v4.3.2
 # renovate: datasource=github-releases depName=derailed/k9s
@@ -80,7 +80,7 @@ ARG HADOLINT_VERSION=v2.15.1
 # renovate: datasource=pypi depName=yamllint
 ARG YAMLLINT_VERSION=1.38.0
 # renovate: datasource=npm depName=renovate
-ARG RENOVATE_VERSION=44.262.0
+ARG RENOVATE_VERSION=44.263.5
 # renovate: datasource=npm depName=prettier
 ARG PRETTIER_VERSION=3.10.1
 # renovate: datasource=github-releases depName=go-delve/delve

@@ -14,7 +14,8 @@ probes="$(
       MISE_PHP_VERSION=$1 php -d zend_extension=xdebug -d extension=pcov -r "
         \$m = array_filter([\"pdo_pgsql\", \"pdo_sqlite\", \"pdo_mysql\", \"intl\", \"gd\", \"zip\", \"sodium\", \"gmp\",
           \"bz2\", \"mbstring\", \"curl\", \"openssl\", \"readline\"], fn (\$e) => !extension_loaded(\$e));
-        echo PHP_VERSION, \" \", phpversion(\"xdebug\"), \" \", phpversion(\"pcov\"), \" \",
+        echo PHP_MAJOR_VERSION, \".\", PHP_MINOR_VERSION, \" \", phpversion(\"xdebug\") ? \"xdebug\" : \"no-xdebug\", \" \",
+          phpversion(\"pcov\") ? \"pcov\" : \"no-pcov\", \" \",
           \$m ? \"missing:\" . implode(\",\", \$m) : \"ext-ok\";"
     }
     phpini() { php -r "echo ini_get(\"$1\");"; }
@@ -49,6 +50,8 @@ probes="$(
     p php84 "phpv 8.4"
     p php85 "phpv 8.5"
     p php-memory "phpini memory_limit"
+    p php-display-errors "phpini display_errors"
+    p php-unloaded "php -m | grep -ci -e xdebug -e pcov || true"
     p composer "composer --version"
     p intelephense "command -v intelephense && jq -r .version /opt/intelephense/node_modules/intelephense/package.json"
     p php-lsp-plugin "jq -r .plugins[].name /opt/claudetainer-plugins/.claude-plugin/marketplace.json"
@@ -130,13 +133,14 @@ expect nvm "$(arg NVM_VERSION | sed 's/^v//')"
 expect nvm-ls "$(arg NODE24_VERSION)"
 expect mise "$(arg MISE_VERSION | sed 's/^v//') "
 expect php-path /opt/mise/shims/php
-expect php-default "PHP $(arg PHP85_VERSION) "
-pcov="$(arg PCOV_VERSION | sed 's/^v//')"
-expect php82 "$(arg PHP82_VERSION) $(arg XDEBUG_VERSION) $pcov ext-ok"
-expect php83 "$(arg PHP83_VERSION) $(arg XDEBUG_VERSION) $pcov ext-ok"
-expect php84 "$(arg PHP84_VERSION) $(arg XDEBUG_VERSION) $pcov ext-ok"
-expect php85 "$(arg PHP85_VERSION) $(arg XDEBUG_VERSION) $pcov ext-ok"
+expect php-default "PHP 8.5."
+expect php82 "8.2 xdebug pcov ext-ok"
+expect php83 "8.3 xdebug pcov ext-ok"
+expect php84 "8.4 xdebug pcov ext-ok"
+expect php85 "8.5 xdebug pcov ext-ok"
 expect php-memory 1G
+expect php-display-errors 1
+expect php-unloaded 0
 expect composer "Composer version $(arg COMPOSER_VERSION) "
 expect intelephense "$(arg INTELEPHENSE_VERSION)"
 expect php-lsp-plugin php-lsp

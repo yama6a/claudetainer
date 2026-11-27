@@ -29,7 +29,7 @@ Every version is an `ARG` at the top of the `Dockerfile`, with a `# renovate:` l
 | Talos | talosctl |
 | Go | Go, gopls, golangci-lint, gofumpt, govulncheck, oapi-codegen, delve |
 | Node | nvm with Node 24 and 26, 26 the default |
-| PHP | mise with PHP 8.2 to 8.5, 8.5 the default. Composer, Xdebug and PCOV, Intelephense |
+| PHP | PHP 8.2 to 8.5 from packages.sury.org, linked into mise, 8.5 the default. Composer, Xdebug and PCOV, Intelephense |
 | Build | build-essential, pkg-config, python3, perl |
 | Lint | shellcheck, shfmt, actionlint, hadolint, yamllint, prettier, Renovate |
 | Databases | psql 18 from PGDG, pgcli, sqlite3 |
@@ -75,17 +75,23 @@ config, `files/claude/` of the chart. The start script copies it into `~/.claude
   seeds config from bind mounts.
 - **nvm with 24 and 26.** Your repos pin Node 24 in `.nvmrc`, and CI runs that. 26 is the default for everything
   else.
-- **PHP compiled from source with mise.** Prebuilt static PHP has no pdo_pgsql, no pdo_sqlite and cannot load
-  Xdebug or PCOV. The Ondrej apt repository has no Ubuntu 26.04 builds, and sessions have no apt anyway. mise
-  with the vfox-php plugin compiles any version, also inside a session, because the image keeps the headers.
-  Cost: each version compiles for about 10 to 20 minutes per architecture. One build stage per version lets
-  BuildKit compile all four at the same time.
+- **PHP from packages.sury.org, linked into mise.** packages.sury.org is the apt repository of the Debian PHP
+  maintainer. It has PHP 8.2 to 8.5 for Ubuntu 26.04 on amd64 and arm64, with pdo_pgsql, pdo_sqlite, Xdebug and
+  PCOV. Its older Launchpad PPA has no 26.04 builds. `mise link` registers each `/usr/bin/phpX.Y` as the mise
+  version X.Y, so `MISE_PHP_VERSION` and `.tool-versions` select it. Nothing compiles during the build.
+- **PHP unpinned.** packages.sury.org keeps only the newest patch of each version, so a pinned patch fails the
+  build once a newer one lands. The apt-get upgrade step at the end of the Dockerfile installs the newest patch
+  on every release.
+- **No extra PHP versions in sessions.** Sessions have no apt, and the image has no PHP headers to compile with.
+  A version beyond 8.2 to 8.5 needs a change to the image.
+- **An empty php.ini.** The Debian php.ini for the CLI is a production config. It hides deprecations and errors,
+  and leaves `$_ENV` empty. With an empty file, PHP runs on its built-in defaults, which show both.
 - **PHP `memory_limit` at 1G.** One PHP process can no longer fill the pod's memory on its own. Sessions raise it
   per command only. `COMPOSER_MEMORY_LIMIT` is 1G too, because Composer raises its own limit to 1.5G otherwise.
-- **Xdebug and PCOV built, not loaded.** Loaded, each slows every PHP command and adds memory. A session loads
+- **Xdebug and PCOV installed, not loaded.** Loaded, each slows every PHP command and adds memory. A session loads
   one with `php -d` for a coverage run.
-- **One pinned Composer for all PHP versions.** vfox-php installs the newest Composer into each version, which
-  nothing pins. The build removes those copies.
+- **One pinned Composer for all PHP versions.** The PHP packages ship no Composer. The image installs one pinned
+  phar, which runs on the PHP that mise selects.
 - **Lint tools in the image.** Sessions installed shellcheck, shfmt, actionlint, hadolint and yamllint by hand,
   again and again. These run the same checks as the org's shell and yaml CI jobs before a push.
 - **Renovate on Node 24.** Renovate refuses any other Node. Its wrappers in `/usr/local/bin` call Node 24

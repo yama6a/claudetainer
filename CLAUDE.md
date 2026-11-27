@@ -9,7 +9,6 @@ built.
 |---|---|
 | `Dockerfile` | the image. Every pinned version is an `ARG` at the top, with a `# renovate:` line above it |
 | `rootfs/` | copied to `/` in the image: the start script, hook scripts, managed settings, the pod CLAUDE.md |
-| `build/` | scripts the Dockerfile runs during the build only, such as the PHP compile |
 | `cmd/login-exporter/` | the sidecar that serves the login expiry as metrics. Go, org conventions |
 | `test/smoke.sh` | checks a built image: every tool, its exact version, its path |
 | `renovate.json5` | which manager owns which pin |

@@ -215,6 +215,7 @@ RUN mkdir -p "${NVM_DIR}" \
 # version, so the packages stay unpinned and the apt-get upgrade step below updates them.
 # mise link makes each /usr/bin/phpX.Y the mise version X.Y, so MISE_PHP_VERSION and .tool-versions select it.
 # An empty php.ini gives PHP's built-in defaults, and apt upgrades keep a php.ini that was changed.
+# mise reshim makes shims only for tools a config or env names, and /etc/mise/config.toml arrives later with rootfs.
 RUN curl -fsSL -o /tmp/debsuryorg-archive-keyring.deb https://packages.sury.org/debsuryorg-archive-keyring.deb \
     && dpkg -i /tmp/debsuryorg-archive-keyring.deb \
     && echo "deb [signed-by=/usr/share/keyrings/debsuryorg-archive-keyring.gpg] https://packages.sury.org/php/ $(sed -n "s/^VERSION_CODENAME=//p" /etc/os-release) main" \
@@ -235,7 +236,7 @@ RUN curl -fsSL -o /tmp/debsuryorg-archive-keyring.deb https://packages.sury.org/
       || exit 1; \
     done \
     && phpdismod xdebug pcov \
-    && MISE_CACHE_DIR=/tmp/mise mise reshim \
+    && MISE_CACHE_DIR=/tmp/mise MISE_PHP_VERSION=8.5 mise reshim \
     && rm -rf /var/lib/apt/lists/* /tmp/mise /tmp/debsuryorg-archive-keyring.deb \
     && chown -R agent:agent /opt/mise
 

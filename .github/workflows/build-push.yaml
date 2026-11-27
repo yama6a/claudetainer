@@ -16,6 +16,7 @@ jobs:
     uses: yama6a/gha/.github/workflows/docker-build-release-multiarch.yaml@v2
     with:
       registry-cache: true # skips the 23-minute PHP compiles while PHP and the base stage are unchanged
+      build-args: OS_UPDATES_RUN=${{ github.run_id }} # a new value per run, so the apt-get upgrade step never comes from the cache
     permissions:
       contents: write # required to create the GitHub release
       packages: write # required, or the image push fails with permission_denied

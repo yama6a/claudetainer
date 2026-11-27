@@ -7,7 +7,7 @@ Why the chart looks the way it does: [../05_deployment.md](../05_deployment.md).
 1. Create the GitHub repo `yama6a/claudetainer`, public, and push this repo to it.
 
 2. In gha, add claudetainer rows and run both scripts:
-   - `scripts/repo-settings.sh`: `claudetainer | main | false | public | go / go,shell,yaml,renovate-config,build-amd64,build-arm64`
+   - `scripts/repo-settings.sh`: `claudetainer | main | false | public | go / go,shell,yaml,build-amd64,build-arm64`
    - `scripts/rollout-renovate-caller.sh`: `claudetainer | main |`
 
 3. Set the repo secrets `DEPLOY_TOKEN` and `RENOVATE_TOKEN`, the same tokens the other app repos use.

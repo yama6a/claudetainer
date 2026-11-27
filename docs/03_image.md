@@ -108,13 +108,15 @@ config, `files/claude/` of the chart. The start script copies it into `~/.claude
 
 | Workflow | When | Does |
 |---|---|---|
-| `ci.yaml` | PRs and main | gha go-ci for the exporter, gha shell and yaml checks, the Renovate config check, and on PRs a native build of each architecture followed by `test/smoke.sh` |
+| `ci.yaml` | PRs | gha go-ci for the exporter (which also checks the Renovate config), gha shell and yaml checks, and a native build of each architecture followed by `test/smoke.sh` |
+| `race.yaml` | weekly on main | go-ci race tests |
+| `warm-cache.yaml` | weekly on main | go-ci cache warming |
 | `build-push.yaml` | main | `docker-build-release-multiarch.yaml@v2`, then `deploy-gitops.yaml@v2` into the GitOps repo |
 | `renovate.yaml` | nightly | gha's Renovate caller |
 
 The build runs natively per architecture, because the apt and Playwright installs are slow and fragile under
 QEMU. The smoke test asserts that every tool answers with the exact pinned version, from the expected path.
-Required checks: `go / go`, `shell`, `yaml`, `renovate-config`, `build-amd64`, `build-arm64`.
+Required checks: `go / go`, `shell`, `yaml`, `build-amd64`, `build-arm64`.
 
 ## Known vulnerabilities
 

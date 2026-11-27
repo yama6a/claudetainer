@@ -38,8 +38,7 @@ No sudo, no apt. Put a missing tool in `~/.local/bin`, or add it to the image wi
 - Node: 26 is the default. `nvm use 24 && npm test`, or `nvm exec 24 npm test`.
 - PHP: 8.5 is the default. `MISE_PHP_VERSION=8.3 composer test`, or `mise exec php@8.3 -- vendor/bin/phpunit`.
   A repo's `.tool-versions` or `mise.toml` selects its version. Run `mise trust` once for a `mise.toml`.
-- mise compiles a missing PHP version in 10 to 20 minutes. It does this on `mise install php@<version>`, and
-  when a repo asks for a version that is not installed.
+- Only PHP 8.2 to 8.5 exist. `mise install php@<version>` fails, because the image has no PHP headers.
 - Xdebug and PCOV are not loaded. Load one per command: `php -d extension=pcov vendor/bin/phpunit --coverage-text`,
   or `XDEBUG_MODE=coverage php -d zend_extension=xdebug ...`.
 - `npm install -g`, `nvm install` and `mise install` write to folders all sessions share. A pod restart removes

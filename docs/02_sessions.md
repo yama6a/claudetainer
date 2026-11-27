@@ -17,7 +17,7 @@ in [runbooks/02_sessions.md](runbooks/02_sessions.md).
 | `/workspace/.tmp/` | Claude Code's temp folder, `CLAUDE_CODE_TMPDIR`: scratchpads and background-command output, one folder per working directory | the sweep, with its session folder. Any other folder per session, 30 days after its newest file changed |
 | `/run/user/1000/` | `XDG_RUNTIME_DIR`: the sockets for messages between sessions | the next pod restart |
 | `/opt/nvm/` | Node 24 and 26, and whatever `npm install -g` adds | the next pod restart |
-| `/opt/mise/` | PHP 8.2 to 8.5, and whatever `mise install` adds | the next pod restart |
+| `/opt/mise/` | the links to PHP 8.2 to 8.5, and whatever `mise install` adds | the next pod restart |
 | `~/.claude/projects/` | transcripts, one folder per session folder | Claude Code, after 365 days |
 
 The volume is 100 GiB, see [05_deployment.md](05_deployment.md).

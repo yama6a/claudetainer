@@ -51,20 +51,6 @@ ARG PGCLI_VERSION=4.7.1
 ARG PG_MAJOR=19
 # renovate: datasource=github-releases depName=jdx/mise
 ARG MISE_VERSION=v2026.11.14
-# renovate: datasource=git-refs depName=https://github.com/jdx/vfox-php branch=main
-ARG VFOX_PHP_REF=23efeea921d89475aabc3f87615b1d47065757ce
-# renovate: datasource=github-tags depName=php/php-src
-ARG PHP82_VERSION=8.2.36
-# renovate: datasource=github-tags depName=php/php-src
-ARG PHP83_VERSION=8.3.37
-# renovate: datasource=github-tags depName=php/php-src
-ARG PHP84_VERSION=8.4.28
-# renovate: datasource=github-tags depName=php/php-src
-ARG PHP85_VERSION=8.5.13
-# renovate: datasource=github-tags depName=xdebug/xdebug
-ARG XDEBUG_VERSION=3.5.3
-# renovate: datasource=github-tags depName=krakjoe/pcov
-ARG PCOV_VERSION=v1.0.12
 # renovate: datasource=github-releases depName=composer/composer
 ARG COMPOSER_VERSION=2.11.3
 # renovate: datasource=npm depName=intelephense
@@ -115,13 +101,9 @@ RUN SUDO_FORCE_REMOVE=yes apt-get purge -y sudo \
     && gpasswd -d agent docker \
     && sed -i '/Docker Sandbox/,/^export BASH_ENV/d' /etc/bash.bashrc
 
-# The PHP headers stay in the final image, because sessions compile further PHP versions without apt.
 ARG PG_MAJOR
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      build-essential file gnupg perl pkg-config python3 sqlite3 wget zip \
-      autoconf bison re2c libbz2-dev libcurl4-openssl-dev libfreetype-dev libgmp-dev libicu-dev libjpeg-dev \
-      libonig-dev libpng-dev libreadline-dev libsodium-dev libsqlite3-dev libssl-dev libwebp-dev libxml2-dev \
-      libzip-dev \
+      build-essential file gnupg perl pkg-config python3 sqlite3 wget zip autoconf \
     && install -m 0755 -d /etc/apt/keyrings \
     && curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc -o /etc/apt/keyrings/postgresql.asc \
     && echo "deb [arch=${TARGETARCH} signed-by=/etc/apt/keyrings/postgresql.asc] https://apt.postgresql.org/pub/repos/apt $(sed -n "s/^VERSION_CODENAME=//p" /etc/os-release)-pgdg main" \
@@ -139,39 +121,6 @@ RUN case "${TARGETARCH}" in amd64) mise_arch=x64 ;; *) mise_arch="${TARGETARCH}"
     && curl -fsSL "https://github.com/jdx/mise/releases/download/${MISE_VERSION}/SHASUMS256.txt" \
       | sed -n "s|  \./mise-${MISE_VERSION}-linux-${mise_arch}\$|  /usr/local/bin/mise|p" | sha256sum -c - \
     && chmod 0755 /usr/local/bin/mise
-
-ARG VFOX_PHP_REF
-RUN MISE_CACHE_DIR=/tmp/mise mise plugins install php "https://github.com/jdx/vfox-php#${VFOX_PHP_REF}" \
-    && rm -rf /tmp/mise
-
-# One stage per PHP version, so BuildKit compiles all four at the same time.
-FROM base AS php82
-ARG PHP82_VERSION
-ARG XDEBUG_VERSION
-ARG PCOV_VERSION
-RUN --mount=type=bind,source=build/php-install.sh,target=/php-install.sh \
-    bash /php-install.sh "${PHP82_VERSION}" "${XDEBUG_VERSION}" "${PCOV_VERSION#v}"
-
-FROM base AS php83
-ARG PHP83_VERSION
-ARG XDEBUG_VERSION
-ARG PCOV_VERSION
-RUN --mount=type=bind,source=build/php-install.sh,target=/php-install.sh \
-    bash /php-install.sh "${PHP83_VERSION}" "${XDEBUG_VERSION}" "${PCOV_VERSION#v}"
-
-FROM base AS php84
-ARG PHP84_VERSION
-ARG XDEBUG_VERSION
-ARG PCOV_VERSION
-RUN --mount=type=bind,source=build/php-install.sh,target=/php-install.sh \
-    bash /php-install.sh "${PHP84_VERSION}" "${XDEBUG_VERSION}" "${PCOV_VERSION#v}"
-
-FROM base AS php85
-ARG PHP85_VERSION
-ARG XDEBUG_VERSION
-ARG PCOV_VERSION
-RUN --mount=type=bind,source=build/php-install.sh,target=/php-install.sh \
-    bash /php-install.sh "${PHP85_VERSION}" "${XDEBUG_VERSION}" "${PCOV_VERSION#v}"
 
 FROM base
 ARG TARGETARCH
@@ -262,13 +211,33 @@ RUN mkdir -p "${NVM_DIR}" \
     && nvm cache clear \
     && chown -R agent:agent "${NVM_DIR}"
 
-COPY --from=php82 /opt/mise/installs/php /opt/mise/installs/php
-COPY --from=php83 /opt/mise/installs/php /opt/mise/installs/php
-COPY --from=php84 /opt/mise/installs/php /opt/mise/installs/php
-COPY --from=php85 /opt/mise/installs/php /opt/mise/installs/php
-# Like /opt/nvm, the pod user owns /opt/mise, so `mise install php@...` works in every session.
-RUN MISE_CACHE_DIR=/tmp/mise mise reshim \
-    && rm -rf /tmp/mise \
+# packages.sury.org is the PHP repository of the Debian PHP maintainer. It keeps only the newest patch of each
+# version, so the packages stay unpinned and the apt-get upgrade step below updates them.
+# mise link makes each /usr/bin/phpX.Y the mise version X.Y, so MISE_PHP_VERSION and .tool-versions select it.
+# An empty php.ini gives PHP's built-in defaults, and apt upgrades keep a php.ini that was changed.
+# mise reshim makes shims only for tools a config or env names, and /etc/mise/config.toml arrives later with rootfs.
+RUN curl -fsSL -o /tmp/debsuryorg-archive-keyring.deb https://packages.sury.org/debsuryorg-archive-keyring.deb \
+    && dpkg -i /tmp/debsuryorg-archive-keyring.deb \
+    && echo "deb [signed-by=/usr/share/keyrings/debsuryorg-archive-keyring.gpg] https://packages.sury.org/php/ $(sed -n "s/^VERSION_CODENAME=//p" /etc/os-release) main" \
+      > /etc/apt/sources.list.d/php.list \
+    && apt-get update \
+    && set -- \
+    && for v in 8.2 8.3 8.4 8.5; do \
+      for e in cli bcmath bz2 curl dba gd gmp intl mbstring mysql pgsql readline soap sqlite3 xml zip xdebug pcov; do \
+        set -- "$@" "php$v-$e"; \
+      done; \
+    done \
+    && apt-get install -y --no-install-recommends "$@" \
+    && for v in 8.2 8.3 8.4 8.5; do \
+      truncate -s 0 "/etc/php/$v/cli/php.ini" \
+      && mkdir -p "/opt/php/$v/bin" \
+      && ln -s "/usr/bin/php$v" "/opt/php/$v/bin/php" \
+      && MISE_CACHE_DIR=/tmp/mise mise link "php@$v" "/opt/php/$v" \
+      || exit 1; \
+    done \
+    && phpdismod xdebug pcov \
+    && MISE_CACHE_DIR=/tmp/mise MISE_PHP_VERSION=8.5 mise reshim \
+    && rm -rf /var/lib/apt/lists/* /tmp/mise /tmp/debsuryorg-archive-keyring.deb \
     && chown -R agent:agent /opt/mise
 
 ENV PATH=/opt/mise/shims:/opt/nvm/current/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
@@ -362,7 +331,7 @@ RUN chmod 0755 /usr/local/bin/claudetainer-start /usr/local/bin/claudetainer-log
     && install -d -m 0700 -o agent -g agent /run/user/1000
 
 # The release build sets OS_UPDATES_RUN to its run ID. The new value skips the layer cache for this step
-# only, so every image gets current Ubuntu security updates while the PHP compiles stay cached.
+# only, so every image gets current Ubuntu and PHP updates while the tool installs above stay cached.
 ARG OS_UPDATES_RUN
 RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
 

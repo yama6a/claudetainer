@@ -116,14 +116,12 @@ RUN SUDO_FORCE_REMOVE=yes apt-get purge -y sudo \
     && sed -i '/Docker Sandbox/,/^export BASH_ENV/d' /etc/bash.bashrc
 
 # The PHP headers stay in the final image, because sessions compile further PHP versions without apt.
-# The base ships an apt with a fixable HIGH CVE, so the install also upgrades apt.
 ARG PG_MAJOR
 RUN apt-get update && apt-get install -y --no-install-recommends \
       build-essential file gnupg perl pkg-config python3 sqlite3 wget zip \
       autoconf bison re2c libbz2-dev libcurl4-openssl-dev libfreetype-dev libgmp-dev libicu-dev libjpeg-dev \
       libonig-dev libpng-dev libreadline-dev libsodium-dev libsqlite3-dev libssl-dev libwebp-dev libxml2-dev \
       libzip-dev \
-    && apt-get install -y --no-install-recommends --only-upgrade apt libapt-pkg7.0 \
     && install -m 0755 -d /etc/apt/keyrings \
     && curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc -o /etc/apt/keyrings/postgresql.asc \
     && echo "deb [arch=${TARGETARCH} signed-by=/etc/apt/keyrings/postgresql.asc] https://apt.postgresql.org/pub/repos/apt $(sed -n "s/^VERSION_CODENAME=//p" /etc/os-release)-pgdg main" \
@@ -362,6 +360,11 @@ RUN chmod 0755 /usr/local/bin/claudetainer-start /usr/local/bin/claudetainer-log
     && mkdir -p /workspace \
     && chown agent:agent /workspace /home/agent \
     && install -d -m 0700 -o agent -g agent /run/user/1000
+
+# The release build sets OS_UPDATES_RUN to its run ID. The new value skips the layer cache for this step
+# only, so every image gets current Ubuntu security updates while the PHP compiles stay cached.
+ARG OS_UPDATES_RUN
+RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
 
 # Empty values override the base image's, which pointed at the removed shared files. The start script
 # unsets them entirely before Claude starts.

@@ -66,7 +66,7 @@ ARG HADOLINT_VERSION=v2.15.1
 # renovate: datasource=pypi depName=yamllint
 ARG YAMLLINT_VERSION=1.38.0
 # renovate: datasource=npm depName=renovate
-ARG RENOVATE_VERSION=44.264.1
+ARG RENOVATE_VERSION=45.3.2
 # renovate: datasource=npm depName=prettier
 ARG PRETTIER_VERSION=3.10.1
 # renovate: datasource=github-releases depName=go-delve/delve
